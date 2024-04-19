@@ -1,4 +1,4 @@
-package com.hustunique.whispy.media
+package com.example.echolingua.media
 
 import java.io.ByteArrayOutputStream
 import java.io.File
