@@ -11,9 +11,9 @@ import com.example.echolingua.App.Companion.modelsPath
 import com.example.echolingua.App.Companion.whisperContext
 import com.example.echolingua.ffmpeg.FFmpegUtil
 import com.example.echolingua.whisper.WhisperContext
-import com.hustunique.whispy.media.decodeWaveFile
-import com.hustunique.whispy.network.DownloadStatus
-import com.hustunique.whispy.network.downloadModel
+import com.example.echolingua.media.decodeWaveFile
+import com.example.echolingua.network.DownloadStatus
+import com.example.echolingua.network.downloadModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

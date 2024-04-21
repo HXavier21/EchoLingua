@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.echolingua.ui.navigator.MyNavigator
+import com.example.echolingua.ui.page.TranslatePage
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,7 +21,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EchoLinguaTheme {
-                MyNavigator()
+                //MyNavigator()
+                TranslatePage()
             }
         }
     }
