@@ -11,6 +11,7 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.util.Locale
 
 private const val TAG = "TranslatePageViewModel"
 
@@ -29,6 +30,11 @@ class TranslatePageViewModel : ViewModel() {
 
     fun setText(text: String) {
         mTextFlow.update { text }
+    }
+
+    fun getLanguageCodeNameMap(): Map<String,String> {
+        return TranslateLanguage.getAllLanguages()
+            .associateWith { Locale.forLanguageTag(it).displayName }
     }
 
     /**
@@ -74,9 +80,10 @@ class TranslatePageViewModel : ViewModel() {
             .addOnFailureListener { exception ->
                 Toast.makeText(
                     App.context,
-                    "Model download failed: $exception",
+                    "Model download failed",
                     Toast.LENGTH_LONG
                 ).show()
+                Log.e(TAG, "translate: ", exception)
             }
     }
 }

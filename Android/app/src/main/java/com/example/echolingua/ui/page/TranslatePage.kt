@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -25,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.mlkit.nl.translate.TranslateLanguage
 
 @Preview
 @Composable
@@ -61,15 +61,16 @@ fun TranslatePage(
                     },
                     onClick = { leftExpanded = true }
                 )
+                Icon(imageVector = Icons.Default.ImportExport, contentDescription = null)
                 DropdownMenu(
                     expanded = leftExpanded,
                     onDismissRequest = { leftExpanded = false }
                 ) {
-                    for (language in TranslateLanguage.getAllLanguages()) {
+                    for (language in translatePageViewModel.getLanguageCodeNameMap()) {
                         DropdownMenuItem(
-                            text = { Text(language) },
+                            text = { Text(language.value) },
                             onClick = {
-                                translatePageViewModel.setSourceLanguage(language)
+                                translatePageViewModel.setSourceLanguage(language.key)
                                 leftExpanded = false
                             }
                         )
@@ -92,11 +93,11 @@ fun TranslatePage(
                     expanded = rightExpanded,
                     onDismissRequest = { rightExpanded = false }
                 ) {
-                    for (language in TranslateLanguage.getAllLanguages()) {
+                    for ((code,name) in translatePageViewModel.getLanguageCodeNameMap()) {
                         DropdownMenuItem(
-                            text = { Text(language) },
+                            text = { Text(name) },
                             onClick = {
-                                translatePageViewModel.setTargetLanguage(language)
+                                translatePageViewModel.setTargetLanguage(code)
                                 rightExpanded = false
                             }
                         )
