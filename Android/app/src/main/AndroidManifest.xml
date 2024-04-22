@@ -16,6 +16,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.EchoLingua"
         tools:targetApi="31">
+
+        <activity
+            android:name=".QuickTranslateActivity"
+            android:exported="true"
+            android:label="@string/title_activity_quick_translate"
+            android:theme="@style/Theme.EchoLingua">
+            <intent-filter>
+                <action android:name="android.intent.action.TRANSLATE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain"/>
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,6 +40,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>
