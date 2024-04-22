@@ -32,7 +32,7 @@ class TranslatePageViewModel : ViewModel() {
         mTextFlow.update { text }
     }
 
-    fun getLanguageCodeNameMap(): Map<String,String> {
+    fun getLanguageCodeNameMap(): Map<String, String> {
         return TranslateLanguage.getAllLanguages()
             .associateWith { Locale.forLanguageTag(it).displayName }
     }
@@ -42,6 +42,15 @@ class TranslatePageViewModel : ViewModel() {
      * @param language defined in [TranslateLanguage].
      */
     fun setSourceLanguage(language: String) {
+        if (language !in TranslateLanguage.getAllLanguages()) {
+            Log.e(TAG, "setSourceLanguage: Invalid language code")
+            Toast.makeText(
+                App.context,
+                "Invalid language code",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
         mSourceLanguageFlow.update { language }
     }
 
@@ -50,6 +59,15 @@ class TranslatePageViewModel : ViewModel() {
      * @param language defined in [TranslateLanguage].
      */
     fun setTargetLanguage(language: String) {
+        if (language !in TranslateLanguage.getAllLanguages()) {
+            Log.e(TAG, "setTargetLanguage: Invalid language code")
+            Toast.makeText(
+                App.context,
+                "Invalid language code",
+                Toast.LENGTH_SHORT
+            ).show()
+            return
+        }
         mTargetLanguageFlow.update { language }
     }
 
@@ -71,10 +89,10 @@ class TranslatePageViewModel : ViewModel() {
                     .addOnFailureListener { exception ->
                         Toast.makeText(
                             App.context,
-                            "Translation failed: $exception",
+                            "Translation failed",
                             Toast.LENGTH_SHORT
                         ).show()
-                        Log.e(TAG, "translate: $exception")
+                        Log.e(TAG, "Translate: $exception")
                     }
             }
             .addOnFailureListener { exception ->
@@ -83,7 +101,7 @@ class TranslatePageViewModel : ViewModel() {
                     "Model download failed",
                     Toast.LENGTH_LONG
                 ).show()
-                Log.e(TAG, "translate: ", exception)
+                Log.e(TAG, "Download Model: ", exception)
             }
     }
 }
