@@ -2,4 +2,9 @@
 <resources>
 
     <style name="Theme.EchoLingua" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="Theme.TransparentStatusBar" parent="android:Theme.Translucent.NoTitleBar">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
 </resources>

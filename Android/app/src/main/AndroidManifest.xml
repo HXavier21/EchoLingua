@@ -21,11 +21,16 @@
             android:name=".QuickTranslateActivity"
             android:exported="true"
             android:label="@string/title_activity_quick_translate"
-            android:theme="@style/Theme.EchoLingua">
+            android:theme="@style/Theme.TransparentStatusBar">
             <intent-filter>
-                <action android:name="android.intent.action.TRANSLATE" />
+                <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain"/>
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 

@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">EchoLingua</string>
-    <string name="title_activity_quick_translate">QuickTranslateActivity</string>
+    <string name="title_activity_quick_translate">EchoLingua</string>
 </resources>
