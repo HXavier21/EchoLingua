@@ -1,14 +1,35 @@
 from flask import Flask, request
-import requests
 import hashlib
 import hmac
 import json
-import sys
 import time
 from datetime import datetime
 from http.client import HTTPSConnection
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:123@localhost/EchoLingua'
+db = SQLAlchemy(app)
+
+
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    # 历史记录对应的表
+    translation_history = db.relationship('TranslationHistory', backref='user', lazy=True)
+
+
+class TranslationHistory(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    source_text = db.Column(db.Text, nullable=False)
+    target_text = db.Column(db.Text, nullable=False)
+    source_language = db.Column(db.String(10), nullable=False)
+    target_language = db.Column(db.String(10), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
 def sign(key, msg):
@@ -17,9 +38,7 @@ def sign(key, msg):
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    get_data = request.get_data()
-    data = json.loads(get_data)
-
+    data = request.get_json()
     secret_id = "AKIDIUSHtw00tffXTH0b5TvKYZMG1ZvLixBI"
     secret_key = "1tkV9rYGnDXmureGfrvtyymVRL9zpiXE"
     token = ""
@@ -93,10 +112,11 @@ def translate():
         req.request("POST", "/", headers=headers, body=params.encode("utf-8"))
         resp = req.getresponse()
         response_data = resp.read().decode("utf-8")
+
+        # 返回结果
         return response_data
     except Exception as err:
         return str(err)
-
 
 
 if __name__ == '__main__':
