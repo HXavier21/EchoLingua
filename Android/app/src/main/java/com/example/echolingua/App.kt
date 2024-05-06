@@ -15,8 +15,10 @@ class App : Application() {
         System.loadLibrary("app")
         modelsPath = File(filesDir, "models")
         audioPath = File(filesDir, "audio")
+        imagePath = File(filesDir, "image")
         modelsPath.mkdirs()
         audioPath.mkdirs()
+        imagePath.mkdirs()
         mediaRecorder = MediaRecorder()
     }
 
@@ -30,6 +32,7 @@ class App : Application() {
         lateinit var context: Context
         lateinit var modelsPath: File
         lateinit var audioPath: File
+        lateinit var imagePath: File
         lateinit var whisperContext: WhisperContext
         lateinit var mediaRecorder: MediaRecorder
     }

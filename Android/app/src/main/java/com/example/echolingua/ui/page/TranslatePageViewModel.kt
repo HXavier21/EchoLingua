@@ -16,9 +16,6 @@ import java.util.Locale
 private const val TAG = "TranslatePageViewModel"
 
 class TranslatePageViewModel : ViewModel() {
-    private val mTextFlow = MutableStateFlow("")
-    val textFlow = mTextFlow.asStateFlow()
-
     private val mSourceLanguageFlow = MutableStateFlow("")
     val sourceLanguageFlow = mSourceLanguageFlow.asStateFlow()
 
@@ -27,10 +24,6 @@ class TranslatePageViewModel : ViewModel() {
 
     private val mTranslatedTextFlow = MutableStateFlow("")
     val translatedTextFlow = mTranslatedTextFlow.asStateFlow()
-
-    fun setText(text: String) {
-        mTextFlow.update { text }
-    }
 
     fun getLanguageCodeNameMap(): Map<String, String> {
         return TranslateLanguage.getAllLanguages()
@@ -71,7 +64,7 @@ class TranslatePageViewModel : ViewModel() {
         mTargetLanguageFlow.update { language }
     }
 
-    fun translate() {
+    fun translate(text: String) {
         val options = TranslatorOptions.Builder()
             .setSourceLanguage(mSourceLanguageFlow.value)
             .setTargetLanguage(mTargetLanguageFlow.value)
@@ -82,7 +75,7 @@ class TranslatePageViewModel : ViewModel() {
             .build()
         translator.downloadModelIfNeeded(conditions)
             .addOnSuccessListener {
-                translator.translate(mTextFlow.value)
+                translator.translate(text)
                     .addOnSuccessListener { translatedText ->
                         mTranslatedTextFlow.update { translatedText }
                     }
@@ -103,5 +96,11 @@ class TranslatePageViewModel : ViewModel() {
                 ).show()
                 Log.e(TAG, "Download Model: ", exception)
             }
+    }
+
+    fun swapLanguage() {
+        val temp = mSourceLanguageFlow.value
+        mSourceLanguageFlow.update { mTargetLanguageFlow.value }
+        mTargetLanguageFlow.update { temp }
     }
 }
