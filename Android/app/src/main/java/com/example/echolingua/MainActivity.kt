@@ -1,26 +1,36 @@
 package com.example.echolingua
 
-import android.content.ContentValues
-import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
-import android.widget.Toast
+import android.util.Rational
+import android.view.MotionEvent
+import android.view.Surface
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.camera.core.CameraControl
+import androidx.camera.core.CameraInfoUnavailableException
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.MeteringPointFactory
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import com.example.echolingua.ui.navigator.MyNavigator
 import com.example.echolingua.ui.page.CameraTranslatePage
 import com.example.echolingua.ui.theme.EchoLinguaTheme
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "MainActivity"
 
@@ -28,34 +38,27 @@ class MainActivity : ComponentActivity() {
 
     private var imageCapture: ImageCapture? = null
 
+    private var cameraProvider: ProcessCameraProvider? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             EchoLinguaTheme {
-                //MyNavigator()
-                CameraTranslatePage()
+                MyNavigator()
             }
         }
     }
 
-    fun takePhoto() {
+    fun takePhoto(
+        onImageSavedCallback: (File) -> Unit = {}
+    ) {
         val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
             .format(System.currentTimeMillis())
-        val contentValues = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
-            }
-        }
+        val imageFile = File.createTempFile(name, ".jpeg")
 
         val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(
-                contentResolver,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues
-            )
+            .Builder(imageFile)
             .build()
 
         imageCapture?.takePicture(
@@ -66,28 +69,28 @@ class MainActivity : ComponentActivity() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults) {
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
+                    onImageSavedCallback(imageFile)
                 }
             }
         )
     }
 
-    fun startCamera() {
-        val cameraController = LifecycleCameraController(baseContext)
+    fun startCamera(width: Int, height: Int) {
         val previewView = findViewById<PreviewView>(R.id.camera_view)
+        previewView.visibility = View.VISIBLE
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener(
             {
-                val cameraProvider = cameraProviderFuture.get()
+                val viewPort = ViewPort.Builder(Rational(width, height), Surface.ROTATION_0).build()
+                cameraProvider = cameraProviderFuture.get()
                 imageCapture = ImageCapture.Builder().build()
                 imageCapture?.let {
-                    bindPreview(cameraProvider, it, previewView)
+                    bindPreview(cameraProvider, it, previewView, viewPort)
                 }
             },
             ContextCompat.getMainExecutor(this)
@@ -96,11 +99,12 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun bindPreview(
-        cameraProvider: ProcessCameraProvider,
+        cameraProvider: ProcessCameraProvider?,
         imageCapture: ImageCapture,
-        previewView: PreviewView
+        previewView: PreviewView,
+        viewPort: ViewPort
     ) {
-        val preview: androidx.camera.core.Preview = androidx.camera.core.Preview.Builder().build()
+        val preview = androidx.camera.core.Preview.Builder().build()
 
         val cameraSelector = CameraSelector.Builder()
             .requireLensFacing(CameraSelector.LENS_FACING_BACK)
@@ -108,12 +112,49 @@ class MainActivity : ComponentActivity() {
 
         preview.setSurfaceProvider(previewView.getSurfaceProvider())
 
-        cameraProvider.bindToLifecycle(
+        val useCaseGroup = UseCaseGroup.Builder()
+            .addUseCase(preview)
+            .addUseCase(imageCapture)
+            .setViewPort(viewPort)
+            .build()
+
+        val camera = cameraProvider?.bindToLifecycle(
             this as LifecycleOwner,
             cameraSelector,
-            imageCapture,
-            preview
+            useCaseGroup
         )
+
+        val cameraControl = camera?.cameraControl
+
+        cameraControl?.let { initCameraListeners(it) }
+    }
+
+    private fun initCameraListeners(cameraControl: CameraControl) {
+        val previewView = findViewById<PreviewView>(R.id.camera_view)
+
+        previewView.setOnTouchListener { view, motionEvent ->
+            view.performClick()
+
+            val meteringPoint = previewView.meteringPointFactory
+                .createPoint(motionEvent.x, motionEvent.y)
+
+            val action = FocusMeteringAction.Builder(
+                meteringPoint,
+                FocusMeteringAction.FLAG_AF
+            ).apply {
+                setAutoCancelDuration(2, TimeUnit.SECONDS)
+            }.build()
+
+            val result = cameraControl.startFocusAndMetering(action)
+
+            return@setOnTouchListener result.isDone
+        }
+    }
+
+    fun stopCamera() {
+        cameraProvider?.unbindAll()
+        val previewView = findViewById<PreviewView>(R.id.camera_view)
+        previewView.visibility = View.GONE
     }
 
 }
