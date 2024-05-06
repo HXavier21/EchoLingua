@@ -1,25 +1,113 @@
-from flask import Flask, request
-import requests
+from flask import Flask, request, jsonify
 import hashlib
 import hmac
 import json
-import sys
 import time
 from datetime import datetime
 from http.client import HTTPSConnection
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
+from sqlalchemy import text
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:123@localhost/EchoLingua'
+db = SQLAlchemy(app)
+
+
+# 以下为用户模型以及对应的历史记录模型
+class User(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(100), nullable=False)
+    # 历史记录对应的表关系
+    translation_history = db.relationship('TranslationHistory', backref='user', lazy=True)
+
+
+class TranslationHistory(db.Model):
+    __tablename__ = 'translation_history_{}'  # 动态表名
+    id = db.Column(db.Integer, primary_key=True)
+    source_text = db.Column(db.Text, nullable=False)
+    target_text = db.Column(db.Text, nullable=False)
+    source_language = db.Column(db.String(10), nullable=False)
+    target_language = db.Column(db.String(10), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
 
 
 def sign(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
+def create_user(email, password):
+    user = User(email=email, password=password)
+    try:
+        # 将用户对象添加到数据库
+        db.session.add(user)
+        db.session.commit()
+
+        # 创建该用户的历史记录表
+        translation_history_table_name = TranslationHistory.__tablename__.format(user.id)
+        sql_query = text(f"""
+                        CREATE TABLE IF NOT EXISTS {translation_history_table_name} (
+                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            source_text TEXT NOT NULL,
+                            target_text TEXT NOT NULL,
+                            source_language VARCHAR(10) NOT NULL,
+                            target_language VARCHAR(10) NOT NULL,
+                            user_id INT NOT NULL,
+                            timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            FOREIGN KEY (user_id) REFERENCES User(id)
+                        );
+                    """)
+        db.session.execute(sql_query)
+        db.session.commit()
+        return True, user.id
+    except Exception as e:
+        db.session.rollback()
+        return False, str(e)
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data['email']
+    password = data['password']
+    if not email or not password:
+        return jsonify({'message': 'Missing data'}), 400
+
+    # 检查是否存在对应的用户邮箱
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({'message': 'Email already registered'}), 400
+
+    # 创建新用户并保存到数据库
+    success, user_id = create_user(email, password)
+    if success:
+        return jsonify({'message': 'User registered successfully', 'user_id': user_id})
+    else:
+        return jsonify({'error': 'User registration failed', 'reason': user_id}), 500
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    # 查询用户
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        # 检查密码是否匹配
+        if user.password == password:
+            return jsonify({'message': 'Login successful'})
+        else:
+            return jsonify({'error': 'Invalid password'}), 401
+    else:
+        return jsonify({'error': 'User not found'}), 404
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    get_data = request.get_data()
-    data = json.loads(get_data)
-
+    data = request.get_json()
     secret_id = "AKIDIUSHtw00tffXTH0b5TvKYZMG1ZvLixBI"
     secret_key = "1tkV9rYGnDXmureGfrvtyymVRL9zpiXE"
     token = ""
@@ -93,10 +181,11 @@ def translate():
         req.request("POST", "/", headers=headers, body=params.encode("utf-8"))
         resp = req.getresponse()
         response_data = resp.read().decode("utf-8")
+
+        # 返回结果
         return response_data
     except Exception as err:
         return str(err)
-
 
 
 if __name__ == '__main__':
