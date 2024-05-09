@@ -8,22 +8,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -46,10 +49,10 @@ fun CameraTranslatePage(
 ) {
     val context = LocalContext.current
     val imageFile by cameraTranslatePageViewModel.imageFileFlow.collectAsState()
+    val recognizedText by cameraTranslatePageViewModel.recognizedTextFlow.collectAsState()
     var isCaptured by remember { mutableStateOf(false) }
-    val displayMetrics = context.resources.displayMetrics
-    val width = displayMetrics.widthPixels - 50
-    val height = displayMetrics.heightPixels
+    var width by remember { mutableIntStateOf(0) }
+    var height by remember { mutableIntStateOf(0) }
 
     val cameraPermissionState =
         rememberPermissionState(
@@ -75,7 +78,14 @@ fun CameraTranslatePage(
         cameraPermissionState.launchPermissionRequest()
     }
 
-    Card(modifier = Modifier.fillMaxSize()) {
+    Card(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned {
+                width = it.size.width
+                height = it.size.height
+            }
+    ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.BottomCenter
@@ -84,7 +94,7 @@ fun CameraTranslatePage(
                 factory = {
                     LayoutInflater
                         .from(it)
-                        .inflate(R.layout.camera_view, null)
+                        .inflate(R.layout.camera_view, null, false)
                 },
                 modifier = Modifier.fillMaxSize()
             )
@@ -93,29 +103,34 @@ fun CameraTranslatePage(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(150.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Button(
+                        LargeFloatingActionButton(
                             onClick = {
                                 (context as MainActivity).takePhoto(
-                                    onImageSavedCallback = {
-                                        cameraTranslatePageViewModel.setImageFile(it)
+                                    onImageSavedCallback = { file ->
+                                        cameraTranslatePageViewModel.setImageFile(file)
                                         TextRecognizer.processImage(
-                                            it.toUri(),
-                                            TranslateLanguage.ENGLISH
+                                            imageFile = file.toUri(),
+                                            language = TranslateLanguage.CHINESE,
+                                            refreshRecognizedText = {
+                                                cameraTranslatePageViewModel.setRecognizedText(it)
+                                            }
                                         )
                                         isCaptured = true
                                         context.stopCamera()
                                     }
                                 )
                             },
-                            shape = CircleShape
+                            shape = CircleShape,
+                            modifier = Modifier.size(90.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Camera,
-                                contentDescription = "Take a photo"
+                                contentDescription = "Take a photo",
+                                modifier = Modifier.size(25.dp)
                             )
                         }
                     }
@@ -123,14 +138,15 @@ fun CameraTranslatePage(
 
                 true -> {
                     PhotoPreview(
-                        painter = rememberAsyncImagePainter(imageFile)
+                        imageFile = imageFile,
+                        recognizeText = recognizedText
                     )
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(60.dp)
                     ) {
-                        Text(text = "Transcribed text here")
+                        Text(text = recognizedText.text)
                     }
                 }
             }
