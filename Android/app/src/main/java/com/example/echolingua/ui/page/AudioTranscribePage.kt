@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 
 data class Model(val name: String, val url: String, val fileSizeInMB: Int = 0)
@@ -48,6 +50,7 @@ val ModelList = listOf(
     ),
 )
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun AudioTranscribePage(
     audioTranscribePageViewModel: AudioTranscribePageViewModel = viewModel()
@@ -61,6 +64,22 @@ fun AudioTranscribePage(
     var expanded by remember {
         mutableStateOf(false)
     }
+
+    val audioRecordPermissionState = rememberPermissionState(
+        permission = android.Manifest.permission.RECORD_AUDIO,
+        onPermissionResult = {
+            if(it){
+                inProcess = if (inProcess) {
+                    audioTranscribePageViewModel.stopRecording()
+                    false
+                } else {
+                    audioTranscribePageViewModel.startRecording()
+                    true
+                }
+            }
+        }
+    )
+
     Card(modifier = Modifier.fillMaxSize()) {
         Box(
             contentAlignment = Alignment.Center,
@@ -108,9 +127,7 @@ fun AudioTranscribePage(
                         (modelState.status as AudioTranscribePageViewModel.ModelState.Status.Downloading).progress
                     }
 
-                    else -> {
-                        0f
-                    }
+                    else -> 0f
                 }
             },
             modifier = Modifier
@@ -122,13 +139,7 @@ fun AudioTranscribePage(
                 .fillMaxWidth()
                 .padding(20.dp),
             onClick = {
-                inProcess = if (inProcess) {
-                    audioTranscribePageViewModel.stopRecording()
-                    false
-                } else {
-                    audioTranscribePageViewModel.startRecording()
-                    true
-                }
+                audioRecordPermissionState.launchPermissionRequest()
             },
             enabled = canTranscribe
         ) {
