@@ -69,6 +69,7 @@ fun TranslatePage(
                         Text(
                             text = when (sourceLanguage) {
                                 "" -> "Source"
+                                "detect" -> "Auto detect"
                                 else -> languageMap[sourceLanguage] ?: "Invalid"
                             }
                         )
@@ -79,6 +80,13 @@ fun TranslatePage(
                     expanded = leftExpanded,
                     onDismissRequest = { leftExpanded = false }
                 ) {
+                    DropdownMenuItem(
+                        text = { Text("Auto detect") },
+                        onClick = {
+                            translatePageViewModel.setSourceLanguage("detect")
+                            leftExpanded = false
+                        }
+                    )
                     for ((code, name) in languageMap) {
                         DropdownMenuItem(
                             text = { Text(name) },

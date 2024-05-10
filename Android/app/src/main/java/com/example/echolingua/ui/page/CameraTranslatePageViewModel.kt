@@ -1,5 +1,6 @@
 package com.example.echolingua.ui.page
 
+import androidx.compose.ui.graphics.Paint
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.text.Text
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,5 +24,4 @@ class CameraTranslatePageViewModel : ViewModel() {
     fun setRecognizedText(text: Text) {
         mRecognizedTextFlow.update { text }
     }
-
 }

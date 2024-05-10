@@ -64,6 +64,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.translate)
+    implementation(libs.language.id)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3.windowSizeClass)
     implementation(libs.text.recognition)

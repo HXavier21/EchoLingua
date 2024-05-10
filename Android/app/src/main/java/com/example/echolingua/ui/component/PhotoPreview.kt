@@ -3,6 +3,7 @@ package com.example.echolingua.ui.component
 import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.Text.Line
@@ -60,8 +62,6 @@ fun PhotoPreview(
     val (imageWidth, imageHeight) = getImageResolution(imageFile)
     var widthZoomRatio by remember { mutableFloatStateOf(0f) }
     var heightZoomRatio by remember { mutableFloatStateOf(0f) }
-    val boxHorizontalPadding = 0
-    val boxVerticalPadding = 0
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -107,43 +107,11 @@ fun PhotoPreview(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.fillMaxSize()
             )
-            Box(modifier = Modifier.fillMaxSize()) {
-                for (block in recognizeText.textBlocks) {
-                    for (line in block.lines) {
-                        Text(
-                            text = line.text,
-                            style = TextStyle(
-                                fontSize =
-                                (getLineHeight(line) * heightZoomRatio)
-                                    .coerceAtLeast(0f)
-                                    .pixelToSp(),
-                                background = Color.White
-                            ),
-                            modifier = Modifier
-                                .graphicsLayer {
-                                    translationX =
-                                        ((line.cornerPoints?.get(0)?.x
-                                            ?: 0) - boxHorizontalPadding) * widthZoomRatio
-                                    translationY =
-                                        ((line.cornerPoints?.get(0)?.y
-                                            ?: 0) - boxVerticalPadding) * heightZoomRatio
-                                    transformOrigin = TransformOrigin(0f, 0f)
-                                    rotationZ = getRotationZ(line).toFloat()
-                                }
-                                .height(
-                                    ((getLineHeight(line) * heightZoomRatio)
-                                        .coerceAtLeast(0f) + boxVerticalPadding * 2)
-                                        .pixelToDp()
-                                )
-                                .border(0.5.dp, Color.Black)
-                                .clickable {
-                                    Log.d(TAG, "PhotoPreview: ${line.text} clicked")
-                                },
-                            maxLines = 1
-                        )
-                    }
-                }
-            }
+            RecognizedTextPreview(
+                recognizeText = recognizeText,
+                widthZoomRatio = widthZoomRatio,
+                heightZoomRatio = heightZoomRatio
+            )
         }
     }
 }
@@ -173,46 +141,4 @@ private fun getImageResolution(imageFile: File): Pair<Int, Int> {
     val imageHeight = options.outHeight
     val imageWidth = options.outWidth
     return Pair(imageHeight, imageWidth)
-}
-
-private fun getLineHeight(line: Line): Int {
-    line.cornerPoints?.get(3)?.let { bottomPoint ->
-        line.cornerPoints?.get(0)?.let { topPoint ->
-            return bottomPoint.y - topPoint.y
-        }
-    }
-    return 0
-}
-
-private fun getLineWidth(line: Line): Int {
-    line.cornerPoints?.get(1)?.let { rightPoint ->
-        line.cornerPoints?.get(0)?.let { leftPoint ->
-            return rightPoint.x - leftPoint.x
-        }
-    }
-    return 0
-}
-
-private fun getRotationZ(line: Line): Double {
-    line.cornerPoints?.get(0)?.let { leftPoint ->
-        line.cornerPoints?.get(1)?.let { rightPoint ->
-            return Math.toDegrees(
-                atan2(
-                    (rightPoint.y - leftPoint.y).toDouble(),
-                    (rightPoint.x - leftPoint.x).toDouble()
-                )
-            )
-        }
-    }
-    return 0.0
-}
-
-@Composable
-private fun Number.pixelToDp(): Dp = with(LocalDensity.current) {
-    toFloat().toDp()
-}
-
-@Composable
-private fun Number.pixelToSp(): TextUnit = with(LocalDensity.current) {
-    toFloat().toSp()
 }
