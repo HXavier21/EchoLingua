@@ -1,8 +1,13 @@
-import json, time, hashlib, hmac
+import hashlib
+import hmac
+import json
+import time
+import numpy as np
 from datetime import datetime
 from http.client import HTTPSConnection
 
 from flask import jsonify
+
 from models import db, User, TranslationHistory
 
 
@@ -10,7 +15,7 @@ def sign(key, msg):
     return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
 
 
-def get_tencent_service(data,email):
+def get_tencent_service(data, email):
     if not email:
         return jsonify({'error': 'Email is required'}), 400
 
@@ -18,8 +23,10 @@ def get_tencent_service(data,email):
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    secret_id = "AKIDIUSHtw00tffXTH0b5TvKYZMG1ZvLixBI"
-    secret_key = "1tkV9rYGnDXmureGfrvtyymVRL9zpiXE"
+    with open("D:\code\SoftwareEngineering\secret_id.txt",'r') as file:
+        secret_id = file.read()
+    with open("D:\code\SoftwareEngineering\secret_key.txt",'r') as file:
+        secret_key = file.read()
     token = ""
 
     service = "tmt"
