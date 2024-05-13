@@ -41,13 +41,6 @@ object TextRecognizer {
 //                            }
 //                        }
 //                    }
-                    for (block in it.textBlocks) {
-                        Log.d(TAG, "processImage: ${block.text}")
-                        block.cornerPoints?.let { points ->
-                            for (point in points)
-                                Log.d(TAG, "processImage: ${point.x}, ${point.y}")
-                        }
-                    }
                     refreshRecognizedText(it)
                 }
                 .addOnFailureListener {
