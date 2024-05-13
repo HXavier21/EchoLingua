@@ -18,62 +18,17 @@ import java.util.Locale
 private const val TAG = "TranslatePageViewModel"
 
 class TranslatePageViewModel : ViewModel() {
-    private val mSourceLanguageFlow = MutableStateFlow("")
-    val sourceLanguageFlow = mSourceLanguageFlow.asStateFlow()
-
-    private val mTargetLanguageFlow = MutableStateFlow("")
-    val targetLanguageFlow = mTargetLanguageFlow.asStateFlow()
-
     private val mTranslatedTextFlow = MutableStateFlow("")
     val translatedTextFlow = mTranslatedTextFlow.asStateFlow()
 
-    fun getLanguageCodeNameMap(): Map<String, String> {
-        return TranslateLanguage.getAllLanguages()
-            .associateWith { Locale.forLanguageTag(it).displayName }
-    }
-
-    /**
-     * Sets the source language for translation.
-     * @param language defined in [TranslateLanguage].
-     */
-    fun setSourceLanguage(language: String) {
-        if (language != "detect" && language !in TranslateLanguage.getAllLanguages()) {
-            Log.e(TAG, "setSourceLanguage: Invalid language code")
-            Toast.makeText(
-                App.context,
-                "Invalid language code",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-        mSourceLanguageFlow.update { language }
-    }
-
-    /**
-     * Sets the target language for translation.
-     * @param language defined in [TranslateLanguage].
-     */
-    fun setTargetLanguage(language: String) {
-        if (language !in TranslateLanguage.getAllLanguages()) {
-            Log.e(TAG, "setTargetLanguage: Invalid language code")
-            Toast.makeText(
-                App.context,
-                "Invalid language code",
-                Toast.LENGTH_SHORT
-            ).show()
-            return
-        }
-        mTargetLanguageFlow.update { language }
-    }
-
     fun translate(text: String) {
-        if (mSourceLanguageFlow.value == "detect") {
+        if (LanguageSelectStateHolder.sourceLanguage.value == "detect") {
             LanguageIdentification.getClient().identifyLanguage(text)
                 .addOnSuccessListener { languageCode ->
                     Log.d(TAG, "translate: $languageCode")
                     val options = TranslatorOptions.Builder()
                         .setSourceLanguage(languageCode)
-                        .setTargetLanguage(mTargetLanguageFlow.value)
+                        .setTargetLanguage(LanguageSelectStateHolder.targetLanguage.value)
                         .build()
                     val translator = Translation.getClient(options)
                     val conditions = DownloadConditions.Builder()
@@ -108,8 +63,8 @@ class TranslatePageViewModel : ViewModel() {
                 }
         } else {
             val options = TranslatorOptions.Builder()
-                .setSourceLanguage(mSourceLanguageFlow.value)
-                .setTargetLanguage(mTargetLanguageFlow.value)
+                .setSourceLanguage(LanguageSelectStateHolder.sourceLanguage.value)
+                .setTargetLanguage(LanguageSelectStateHolder.targetLanguage.value)
                 .build()
             val translator = Translation.getClient(options)
             val conditions = DownloadConditions.Builder()
@@ -141,9 +96,4 @@ class TranslatePageViewModel : ViewModel() {
         }
     }
 
-    fun swapLanguage() {
-        val temp = mSourceLanguageFlow.value
-        mSourceLanguageFlow.update { mTargetLanguageFlow.value }
-        mTargetLanguageFlow.update { temp }
-    }
 }
