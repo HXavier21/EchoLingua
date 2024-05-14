@@ -1,6 +1,8 @@
 package com.example.echolingua.ui.page
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -14,15 +16,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,12 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.rememberAsyncImagePainter
 import com.example.echolingua.MainActivity
 import com.example.echolingua.R
 import com.example.echolingua.ui.component.PhotoPreview
@@ -50,6 +48,10 @@ import com.example.echolingua.util.TextRecognizer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.mlkit.nl.translate.TranslateLanguage
+import java.io.File
+import kotlin.math.log
+
+private const val TAG = "CameraTranslatePage"
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -77,6 +79,9 @@ fun CameraTranslatePage(
     BackHandler {
         if (isCaptured) {
             isCaptured = false
+            cameraTranslatePageViewModel.setRecognizedText(
+                com.google.mlkit.vision.text.Text("", listOf<String>())
+            )
             cameraPermissionState.launchPermissionRequest()
         } else {
             (context as MainActivity).stopCamera()
@@ -125,14 +130,54 @@ fun CameraTranslatePage(
                                 imageVector = Icons.Outlined.Image,
                                 contentDescription = "Pick image",
                                 modifier = Modifier
+                                    .clickable {
+                                        (context as MainActivity).pickMedia(
+                                            onSuccess = { uri ->
+                                                Log.d(TAG, "CameraTranslatePage: $uri")
+                                                context.contentResolver
+                                                    .openInputStream(uri)
+                                                    ?.use {
+                                                        File
+                                                            .createTempFile("temp", ".jpeg")
+                                                            .apply {
+                                                                writeBytes(it.readBytes())
+                                                            }
+                                                    }
+                                                    ?.let {
+                                                        cameraTranslatePageViewModel.setImageFile(it)
+                                                    }
+                                                TextRecognizer.processImage(
+                                                    imageFile = uri,
+                                                    language = TranslateLanguage.CHINESE,
+                                                    refreshRecognizedText = {
+                                                        cameraTranslatePageViewModel.setRecognizedText(
+                                                            it
+                                                        )
+                                                    }
+                                                )
+                                                isCaptured = true
+                                                context.stopCamera()
+                                            },
+                                            onFailure = {
+                                                Log.d(
+                                                    TAG,
+                                                    "CameraTranslatePage: No image picked"
+                                                )
+                                                Toast
+                                                    .makeText(
+                                                        context,
+                                                        "No image picked",
+                                                        Toast.LENGTH_SHORT
+                                                    )
+                                                    .show()
+                                            }
+                                        )
+                                    }
                                     .background(
                                         Color.Black.copy(alpha = 0.8f),
                                         CircleShape
                                     )
-                                    .padding(10.dp)
-                                    .clickable {
-
-                                    }
+                                    .padding(15.dp)
                             )
                         }
 

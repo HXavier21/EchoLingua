@@ -18,7 +18,6 @@ import com.example.echolingua.ui.page.LanguageSelectPage
 import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.page.TranslatePage
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MyNavigator(
     navController: NavHostController = rememberNavController(),
@@ -60,10 +59,9 @@ fun MyNavigator(
             )
         ) {
             LanguageSelectPage(
-                selectMode = it.arguments?.getSerializable(
-                    SELECT_MODE,
-                    SelectMode::class.java
-                ) as SelectMode,
+                selectMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                    it.arguments?.getSerializable(SELECT_MODE, SelectMode::class.java) as SelectMode
+                else it.arguments?.getSerializable(SELECT_MODE) as SelectMode,
                 onBackClick = {
                     navController.popBackStack()
                 }

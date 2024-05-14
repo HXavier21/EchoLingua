@@ -36,11 +36,21 @@ import kotlin.math.sqrt
 
 private const val TAG = "RecognizedTextPreview"
 
+/**
+ * RecognizedTextPreview is a composable function that displays the recognized text on the screen.
+ * @param recognizeText The recognized text object.
+ * @param widthZoomRatio The zoom ratio of the width of the recognized text.
+ * @param heightZoomRatio The zoom ratio of the height of the recognized text.
+ * @param spaceX The space between the left edge of the screen and the scaled image.
+ * @param spaceY The space between the top edge of the screen and the scaled image.
+ */
 @Composable
 fun RecognizedTextPreview(
     recognizeText: Text,
     widthZoomRatio: Float,
     heightZoomRatio: Float,
+    spaceX: Float = 0f,
+    spaceY: Float = 0f
 ) {
     val boxHorizontalPadding = 20
     val boxVerticalPadding = 5
@@ -55,10 +65,10 @@ fun RecognizedTextPreview(
                     modifier = Modifier
                         .graphicsLayer {
                             translationX =
-                                (line.cornerPoints?.get(0)?.x
+                                spaceX + (line.cornerPoints?.get(0)?.x
                                     ?: 0) * widthZoomRatio
                             translationY =
-                                (line.cornerPoints?.get(0)?.y
+                                spaceY + (line.cornerPoints?.get(0)?.y
                                     ?: 0) * heightZoomRatio
                             transformOrigin = TransformOrigin(0f, 0f)
                             rotationZ = getRotationZ(line).toFloat()
@@ -82,15 +92,15 @@ fun RecognizedTextPreview(
                         fontSize = realHeight.coerceAtLeast(0f)
                         paint.textSize = fontSize
                         withContext(Dispatchers.IO) {
-                            while (paint.measureText(line.text) < realWidth) {
-                                letterPadding += 0.1f
+                            while (paint.measureText(line.text) > realWidth) {
+                                fontSize -= 0.1f
                                 paint = Paint().asFrameworkPaint().apply {
                                     textSize = fontSize
                                     letterSpacing = letterPadding
                                 }
                             }
-                            while (paint.measureText(line.text) > realWidth) {
-                                fontSize -= 0.1f
+                            while (paint.measureText(line.text) < realWidth) {
+                                letterPadding += 0.01f
                                 paint = Paint().asFrameworkPaint().apply {
                                     textSize = fontSize
                                     letterSpacing = letterPadding
