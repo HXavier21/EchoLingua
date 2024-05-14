@@ -1,5 +1,7 @@
 package com.example.echolingua.ui.page
 
+import android.Manifest
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
@@ -68,11 +70,59 @@ fun CameraTranslatePage(
 
     val cameraPermissionState =
         rememberPermissionState(
-            permission = android.Manifest.permission.CAMERA,
+            permission = Manifest.permission.CAMERA,
             onPermissionResult = {
                 if (it) {
                     (context as MainActivity).startCamera(width, height)
                 }
+            }
+        )
+    val mediaPermissionState =
+        rememberPermissionState(
+            permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                Manifest.permission.READ_MEDIA_IMAGES
+            else Manifest.permission.READ_EXTERNAL_STORAGE,
+            onPermissionResult = {
+                (context as MainActivity).pickMedia(
+                    onSuccess = { uri ->
+                        Log.d(TAG, "CameraTranslatePage: $uri")
+                        context.contentResolver
+                            .openInputStream(uri)
+                            ?.use {
+                                File
+                                    .createTempFile("temp", ".jpeg")
+                                    .apply {
+                                        writeBytes(it.readBytes())
+                                    }
+                            }
+                            ?.let {
+                                cameraTranslatePageViewModel.setImageFile(it)
+                            }
+                        TextRecognizer.processImage(
+                            imageFile = uri,
+                            language = TranslateLanguage.CHINESE,
+                            refreshRecognizedText = {
+                                cameraTranslatePageViewModel.setRecognizedText(
+                                    it
+                                )
+                            }
+                        )
+                        isCaptured = true
+                        context.stopCamera()
+                    },
+                    onFailure = {
+                        Log.d(TAG, "CameraTranslatePage: No image picked")
+                        Toast
+                            .makeText(
+                                context,
+                                "No image picked",
+                                Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    }
+                )
             }
         )
 
@@ -131,47 +181,7 @@ fun CameraTranslatePage(
                                 contentDescription = "Pick image",
                                 modifier = Modifier
                                     .clickable {
-                                        (context as MainActivity).pickMedia(
-                                            onSuccess = { uri ->
-                                                Log.d(TAG, "CameraTranslatePage: $uri")
-                                                context.contentResolver
-                                                    .openInputStream(uri)
-                                                    ?.use {
-                                                        File
-                                                            .createTempFile("temp", ".jpeg")
-                                                            .apply {
-                                                                writeBytes(it.readBytes())
-                                                            }
-                                                    }
-                                                    ?.let {
-                                                        cameraTranslatePageViewModel.setImageFile(it)
-                                                    }
-                                                TextRecognizer.processImage(
-                                                    imageFile = uri,
-                                                    language = TranslateLanguage.CHINESE,
-                                                    refreshRecognizedText = {
-                                                        cameraTranslatePageViewModel.setRecognizedText(
-                                                            it
-                                                        )
-                                                    }
-                                                )
-                                                isCaptured = true
-                                                context.stopCamera()
-                                            },
-                                            onFailure = {
-                                                Log.d(
-                                                    TAG,
-                                                    "CameraTranslatePage: No image picked"
-                                                )
-                                                Toast
-                                                    .makeText(
-                                                        context,
-                                                        "No image picked",
-                                                        Toast.LENGTH_SHORT
-                                                    )
-                                                    .show()
-                                            }
-                                        )
+                                        mediaPermissionState.launchPermissionRequest()
                                     }
                                     .background(
                                         Color.Black.copy(alpha = 0.8f),
