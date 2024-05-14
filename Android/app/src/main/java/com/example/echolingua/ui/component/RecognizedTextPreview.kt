@@ -3,12 +3,11 @@ package com.example.echolingua.ui.component
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,8 +27,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import com.example.echolingua.ui.page.CameraTranslatePageViewModel
 import com.google.mlkit.vision.text.Text
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -74,8 +71,10 @@ fun RecognizedTextPreview(
                             (realWidth.coerceAtLeast(0f) + boxHorizontalPadding * 2).pixelToDp(),
                             (realHeight.coerceAtLeast(0f) + boxVerticalPadding * 2).pixelToDp()
                         )
-                        .border(0.5.dp, Color.Black)
-                        .background(Color.White),
+                        .background(
+                            color = Color.White.copy(alpha = 0.9f),
+                            shape = MaterialTheme.shapes.extraSmall
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     var paint by remember { mutableStateOf(Paint().asFrameworkPaint()) }

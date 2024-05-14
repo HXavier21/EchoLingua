@@ -31,26 +31,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 
-@Preview
 @Composable
 fun TranslatePage(
     translatePageViewModel: TranslatePageViewModel = viewModel(),
     onNavigateToCameraTranslatePage: () -> Unit = {},
-    onNavigateToAudioTranscribePage: () -> Unit = {}
+    onNavigateToAudioTranscribePage: () -> Unit = {},
+    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {}
 ) {
     val translatedText by translatePageViewModel.translatedTextFlow.collectAsState()
     var text by remember {
         mutableStateOf("")
     }
-    val sourceLanguage by translatePageViewModel.sourceLanguageFlow.collectAsState()
-    val targetLanguage by translatePageViewModel.targetLanguageFlow.collectAsState()
-    var leftExpanded by remember {
-        mutableStateOf(false)
-    }
-    var rightExpanded by remember {
-        mutableStateOf(false)
-    }
-    val languageMap = translatePageViewModel.getLanguageCodeNameMap()
+    val sourceLanguage by LanguageSelectStateHolder.sourceLanguage
+    val targetLanguage by LanguageSelectStateHolder.targetLanguage
+    val languageMap = LanguageSelectStateHolder.getLanguageCodeNameMap()
     Card(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
@@ -74,29 +68,10 @@ fun TranslatePage(
                             }
                         )
                     },
-                    onClick = { leftExpanded = true }
-                )
-                DropdownMenu(
-                    expanded = leftExpanded,
-                    onDismissRequest = { leftExpanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Auto detect") },
-                        onClick = {
-                            translatePageViewModel.setSourceLanguage("detect")
-                            leftExpanded = false
-                        }
-                    )
-                    for ((code, name) in languageMap) {
-                        DropdownMenuItem(
-                            text = { Text(name) },
-                            onClick = {
-                                translatePageViewModel.setSourceLanguage(code)
-                                leftExpanded = false
-                            }
-                        )
+                    onClick = {
+                        onNavigateToLanguageSelectPage(SelectMode.SOURCE)
                     }
-                }
+                )
             }
             Icon(
                 imageVector = Icons.Default.ImportExport,
@@ -104,7 +79,7 @@ fun TranslatePage(
                 modifier = Modifier
                     .graphicsLayer(rotationZ = 90f)
                     .clickable {
-                        translatePageViewModel.swapLanguage()
+                        LanguageSelectStateHolder.swapLanguage()
                     }
             )
             Box(modifier = Modifier.weight(1f)) {
@@ -117,22 +92,10 @@ fun TranslatePage(
                             }
                         )
                     },
-                    onClick = { rightExpanded = true }
-                )
-                DropdownMenu(
-                    expanded = rightExpanded,
-                    onDismissRequest = { rightExpanded = false }
-                ) {
-                    for ((code, name) in languageMap) {
-                        DropdownMenuItem(
-                            text = { Text(name) },
-                            onClick = {
-                                translatePageViewModel.setTargetLanguage(code)
-                                rightExpanded = false
-                            }
-                        )
+                    onClick = {
+                        onNavigateToLanguageSelectPage(SelectMode.TARGET)
                     }
-                }
+                )
             }
         }
         OutlinedTextField(
@@ -173,4 +136,10 @@ fun TranslatePage(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun TranslatePagePreview() {
+    TranslatePage()
 }
