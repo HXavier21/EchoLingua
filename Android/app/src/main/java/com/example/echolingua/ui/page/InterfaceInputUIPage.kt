@@ -1,5 +1,6 @@
 package com.example.echolingua.ui.page
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,8 +27,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.R
+import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @Composable
 fun Interface2(
@@ -126,4 +129,23 @@ fun FeedbackIcon() {
         Icons.Filled.MoreVert,
         contentDescription = "feedback",
     )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InterfaceInputPreview() {
+    EchoLinguaTheme {
+        Interface2()
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true
+)
+@Composable
+fun DarkModeInterfaceInputPreview() {
+    EchoLinguaTheme {
+        Interface2()
+    }
 }

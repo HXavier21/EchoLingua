@@ -1,5 +1,6 @@
 package com.example.echolingua.ui.page
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,9 +42,11 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.echolingua.R
+import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @Composable
 fun KeyBoardController(){
@@ -282,5 +285,24 @@ fun CameraButton(){
             text = "相机",
             fontSize = 10.sp
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InterfaceMainPreview() {
+    EchoLinguaTheme {
+        Interface2()
+    }
+}
+
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true
+)
+@Composable
+fun DarkModeInterfaceMainPreview() {
+    EchoLinguaTheme {
+        Interface2()
     }
 }
