@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -63,15 +64,20 @@ dependencies {
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     implementation(libs.translate)
     implementation(libs.language.id)
+
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3.windowSizeClass)
-    implementation(libs.text.recognition)
     implementation(libs.accompanist.permissions)
-    // To recognize Chinese script
-    implementation(libs.text.recognition.chinese)
     implementation(libs.coil.compose)
+
+    implementation(libs.text.recognition)
+    implementation(libs.text.recognition.chinese)
+
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

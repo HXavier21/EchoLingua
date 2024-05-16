@@ -18,56 +18,51 @@ import com.example.echolingua.ui.page.LanguageSelectPage
 import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.page.TranslatePage
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MyNavigator(
     navController: NavHostController = rememberNavController(),
     startDestination: String = RouteName.TRANSLATE_PAGE
 ) {
     NavHost(
-        navController = navController,
-        startDestination = startDestination
+        navController = navController, startDestination = startDestination
     ) {
         composable(RouteName.TRANSLATE_PAGE) {
-            TranslatePage(
-                onNavigateToAudioTranscribePage = {
-                    navController.navigate(RouteName.AUDIO_TRANSCRIBE_PAGE)
-                },
-                onNavigateToCameraTranslatePage = {
-                    navController.navigate(RouteName.CAMERA_TRANSLATE_PAGE)
-                },
-                onNavigateToLanguageSelectPage = { selectMode ->
-                    navController.navigate(RouteName.LANGUAGE_SELECT_PAGE withArgument selectMode)
-                }
-            )
+            TranslatePage(onNavigateToAudioTranscribePage = {
+                navController.navigate(RouteName.AUDIO_TRANSCRIBE_PAGE)
+            }, onNavigateToCameraTranslatePage = {
+                navController.navigate(RouteName.CAMERA_TRANSLATE_PAGE)
+            }, onNavigateToLanguageSelectPage = { selectMode ->
+                navController.navigate(RouteName.LANGUAGE_SELECT_PAGE withArgument selectMode)
+            })
         }
         composable(RouteName.AUDIO_TRANSCRIBE_PAGE) {
             AudioTranscribePage()
         }
         composable(RouteName.CAMERA_TRANSLATE_PAGE) {
-            CameraTranslatePage(
-                onNavigateBackToTranslatePage = {
-                    navController.popBackStack()
-                }
-            )
+            CameraTranslatePage(onNavigateBackToTranslatePage = {
+                navController.popBackStack()
+            }, onNavigateToSourceLanguageSelectPage = { selectMode ->
+                navController.navigate(
+                    RouteName.LANGUAGE_SELECT_PAGE withArgument selectMode,
+                )
+            }, onNavigateToTargetLanguageSelectPage = { selectMode ->
+                navController.navigate(
+                    RouteName.LANGUAGE_SELECT_PAGE withArgument selectMode,
+                )
+            })
         }
         composable(
             RouteName.LANGUAGE_SELECT_PAGE withArgumentKey SELECT_MODE,
-            arguments = listOf(
-                navArgument(SELECT_MODE) {
-                    type = NavType.EnumType(SelectMode::class.java)
-                }
-            )
+            arguments = listOf(navArgument(SELECT_MODE) {
+                type = NavType.EnumType(SelectMode::class.java)
+            })
         ) {
-            LanguageSelectPage(
-                selectMode = it.arguments?.getSerializable(
-                    SELECT_MODE,
-                    SelectMode::class.java
-                ) as SelectMode,
-                onBackClick = {
-                    navController.popBackStack()
-                }
-            )
+            LanguageSelectPage(selectMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) it.arguments?.getSerializable(
+                SELECT_MODE, SelectMode::class.java
+            ) as SelectMode
+            else it.arguments?.getSerializable(SELECT_MODE) as SelectMode, onBackClick = {
+                navController.popBackStack()
+            })
         }
 
     }

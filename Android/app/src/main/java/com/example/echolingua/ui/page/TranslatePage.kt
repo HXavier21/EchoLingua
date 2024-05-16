@@ -42,9 +42,6 @@ fun TranslatePage(
     var text by remember {
         mutableStateOf("")
     }
-    val sourceLanguage by LanguageSelectStateHolder.sourceLanguage
-    val targetLanguage by LanguageSelectStateHolder.targetLanguage
-    val languageMap = LanguageSelectStateHolder.getLanguageCodeNameMap()
     Card(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier
@@ -61,11 +58,7 @@ fun TranslatePage(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = when (sourceLanguage) {
-                                "" -> "Source"
-                                "detect" -> "Auto detect"
-                                else -> languageMap[sourceLanguage] ?: "Invalid"
-                            }
+                            text = LanguageSelectStateHolder.getSourceLanguageDisplayName()
                         )
                     },
                     onClick = {
@@ -86,10 +79,7 @@ fun TranslatePage(
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = when (targetLanguage) {
-                                "" -> "Target"
-                                else -> languageMap[targetLanguage] ?: "Invalid"
-                            }
+                            text = LanguageSelectStateHolder.getTargetLanguageDisplayName()
                         )
                     },
                     onClick = {

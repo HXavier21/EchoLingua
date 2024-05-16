@@ -18,10 +18,8 @@ object LanguageSelectStateHolder {
     private var mTargetLanguage = mutableStateOf("")
     val targetLanguage = mTargetLanguage
 
-    fun getLanguageCodeNameMap(): Map<String, String> {
-        return TranslateLanguage.getAllLanguages()
-            .associateWith { Locale.forLanguageTag(it).displayName }
-    }
+    val languageMap =
+        TranslateLanguage.getAllLanguages().associateWith { Locale.forLanguageTag(it).displayName }
 
     /**
      * Sets the language for translation.
@@ -29,15 +27,10 @@ object LanguageSelectStateHolder {
      * @param mode [SelectMode] to specify the language to set.
      */
     fun setLanguage(language: String, mode: SelectMode) {
-        if (
-            (language != "detect" && language !in TranslateLanguage.getAllLanguages())
-            || (language == "detect" && mode != SelectMode.SOURCE)
-        ) {
+        if ((language != "detect" && language !in TranslateLanguage.getAllLanguages()) || (language == "detect" && mode != SelectMode.SOURCE)) {
             Log.e(TAG, "setLanguage: Invalid language code")
             Toast.makeText(
-                App.context,
-                "Invalid language code",
-                Toast.LENGTH_SHORT
+                App.context, "Invalid language code", Toast.LENGTH_SHORT
             ).show()
             return
         }
@@ -60,5 +53,30 @@ object LanguageSelectStateHolder {
         val temp = mSourceLanguage.value
         mSourceLanguage.value = mTargetLanguage.value
         mTargetLanguage.value = temp
+    }
+
+    fun getSourceLanguageDisplayName(): String {
+        return when (mSourceLanguage.value) {
+            "" -> {
+                "Source"
+            }
+            "detect" -> {
+                "Auto detect"
+            }
+            else -> {
+                languageMap[mSourceLanguage.value] ?: ""
+            }
+        }
+    }
+
+    fun getTargetLanguageDisplayName(): String {
+        return when (mTargetLanguage.value) {
+            "" -> {
+                "Target"
+            }
+            else -> {
+                languageMap[mTargetLanguage.value] ?: ""
+            }
+        }
     }
 }

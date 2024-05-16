@@ -34,17 +34,10 @@ object TextRecognizer {
         }?.let { recognizer ->
             recognizer.process(image)
                 .addOnSuccessListener {
-//                    for (block in it.textBlocks) {
-//                        for (line in block.lines) {
-//                            for (element in line.elements) {
-//                                Log.d(TAG, "processImage: ${element.text}")
-//                            }
-//                        }
-//                    }
                     refreshRecognizedText(it)
                 }
                 .addOnFailureListener {
-                    Log.e(TAG, "processImage: $it")
+                    Log.e(TAG, "processImage: ${it.stackTraceToString()}")
                     Toast.makeText(
                         App.context,
                         "Failed to recognize text",

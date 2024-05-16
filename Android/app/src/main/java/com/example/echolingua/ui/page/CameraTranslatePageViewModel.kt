@@ -1,6 +1,5 @@
 package com.example.echolingua.ui.page
 
-import androidx.compose.ui.graphics.Paint
 import androidx.lifecycle.ViewModel
 import com.google.mlkit.vision.text.Text
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +16,18 @@ class CameraTranslatePageViewModel : ViewModel() {
     private val mRecognizedTextFlow = MutableStateFlow(Text("", listOf<String>()))
     val recognizedTextFlow = mRecognizedTextFlow.asStateFlow()
 
+    private val mShowOriginalTextFlow = MutableStateFlow(false)
+    val showOriginalTextFlow = mShowOriginalTextFlow.asStateFlow()
+
     fun setImageFile(file: File) {
         mImageFileFlow.update { file }
     }
 
     fun setRecognizedText(text: Text) {
         mRecognizedTextFlow.update { text }
+    }
+
+    fun setShowOriginText(show: Boolean) {
+        mShowOriginalTextFlow.update { show }
     }
 }
