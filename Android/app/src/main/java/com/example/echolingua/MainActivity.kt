@@ -59,8 +59,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun <I, O> ComponentActivity.registerActivityResultLauncher(
-        contract: ActivityResultContract<I, O>,
-        callback: ActivityResultCallback<O>
+        contract: ActivityResultContract<I, O>, callback: ActivityResultCallback<O>
     ): ActivityResultLauncher<I> {
         val key = UUID.randomUUID().toString()
         return activityResultRegistry.register(key, contract, callback)
@@ -71,14 +70,13 @@ class MainActivity : ComponentActivity() {
         onFailure: () -> Unit = {},
         visualMediaType: ActivityResultContracts.PickVisualMedia.VisualMediaType = ActivityResultContracts.PickVisualMedia.ImageOnly
     ) {
-        pickMedia = registerActivityResultLauncher(
-            contract = ActivityResultContracts.PickVisualMedia(),
-            callback = { result ->
-                result?.let {
-                    onSuccess(it)
-                } ?: onFailure()
-            }
-        )
+        pickMedia =
+            registerActivityResultLauncher(contract = ActivityResultContracts.PickVisualMedia(),
+                callback = { result ->
+                    result?.let {
+                        onSuccess(it)
+                    } ?: onFailure()
+                })
         pickMedia.launch(
             PickVisualMediaRequest(
                 visualMediaType

@@ -32,7 +32,8 @@ private const val TAG = "PhotoPreview"
 @Composable
 fun PhotoPreview(
     imageFile: File,
-    recognizeText: Text
+    recognizeText: Text,
+    showOriginalText:Boolean = false
 ) {
     var scale by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
@@ -80,7 +81,7 @@ fun PhotoPreview(
                         scale = (zoom * scale).coerceIn(0.6f, 5f)
                         offset =
                             if (scale >= 1) calOffset(imageSize, scale, offset + pan * scale)
-                            else Offset(0f, pan.y * scale)
+                            else Offset(0f, (offset.y + pan.y * scale).coerceIn(-200f,200f))
                     }
                 }
                 .pointerInput("tap") {
@@ -112,7 +113,8 @@ fun PhotoPreview(
                 widthZoomRatio = widthZoomRatio,
                 heightZoomRatio = heightZoomRatio,
                 spaceX = spaceX,
-                spaceY = spaceY
+                spaceY = spaceY,
+                showOriginalText = showOriginalText
             )
         }
     }

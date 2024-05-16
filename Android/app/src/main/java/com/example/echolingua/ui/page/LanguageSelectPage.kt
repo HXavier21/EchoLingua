@@ -85,7 +85,7 @@ fun LanguageSelectPage(
     var searchText by remember {
         mutableStateOf("")
     }
-    val languageMap = LanguageSelectStateHolder.getLanguageCodeNameMap()
+    val languageMap = LanguageSelectStateHolder.languageMap
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     if (isSearching) {
         BackHandler {
@@ -282,6 +282,7 @@ fun LanguageSelectPage(
                                     LanguageSelectStateHolder.setLanguage(
                                         "detect", selectMode
                                     )
+                                    onBackClick()
                                 }, verticalAlignment = Alignment.CenterVertically
                         ) {
                             if (selectedLanguage == "detect") {
@@ -337,6 +338,7 @@ fun LanguageSelectPage(
                                     LanguageSelectStateHolder.setLanguage(
                                         key, selectMode
                                     )
+                                    onBackClick()
                                 },
                                 onDownloadClick = {
                                     TranslateModelStateHolder.downloadModel(key)
@@ -374,6 +376,7 @@ fun LanguageSelectPage(
                                 LanguageSelectStateHolder.setLanguage(
                                     key, selectMode
                                 )
+                                onBackClick()
                             },
                             onDownloadClick = {
                                 TranslateModelStateHolder.downloadModel(key)

@@ -27,6 +27,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import com.example.echolingua.util.Translator
 import com.google.mlkit.vision.text.Text
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -50,17 +51,37 @@ fun RecognizedTextPreview(
     widthZoomRatio: Float,
     heightZoomRatio: Float,
     spaceX: Float = 0f,
-    spaceY: Float = 0f
+    spaceY: Float = 0f,
+    showOriginalText: Boolean = false
 ) {
-    val boxHorizontalPadding = 20
-    val boxVerticalPadding = 5
+    val boxHorizontalPadding = 20f
+    val boxVerticalPadding = 5f
     Box(modifier = Modifier.fillMaxSize()) {
         for (block in recognizeText.textBlocks) {
             for (line in block.lines) {
-                var letterPadding by remember { mutableFloatStateOf(0f) }
-                var fontSize by remember { mutableFloatStateOf(0f) }
                 val realWidth = getLineWidth(line) * widthZoomRatio
                 val realHeight = getLineHeight(line) * heightZoomRatio
+                var textToShow by remember { mutableStateOf(line.text) }
+                var translatedText by remember { mutableStateOf("") }
+                LaunchedEffect(key1 = showOriginalText) {
+                    if (translatedText == "") {
+                        withContext(Dispatchers.Default) {
+                            Translator.translateWithAutoDetect(line.text) { result ->
+                                translatedText = result
+                                if (!showOriginalText) {
+                                    textToShow = result
+                                }
+                            }
+                        }
+                    } else {
+                        textToShow = if (showOriginalText) {
+                            line.text
+                        } else {
+                            translatedText
+                        }
+
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .graphicsLayer {
@@ -84,59 +105,14 @@ fun RecognizedTextPreview(
                         .background(
                             color = Color.White.copy(alpha = 0.9f),
                             shape = MaterialTheme.shapes.extraSmall
-                        ),
-                    contentAlignment = Alignment.Center
+                        )
                 ) {
-                    var paint by remember { mutableStateOf(Paint().asFrameworkPaint()) }
-                    LaunchedEffect(key1 = line) {
-                        fontSize = realHeight.coerceAtLeast(0f)
-                        paint.textSize = fontSize
-                        withContext(Dispatchers.IO) {
-                            while (paint.measureText(line.text) > realWidth) {
-                                fontSize -= 0.1f
-                                paint = Paint().asFrameworkPaint().apply {
-                                    textSize = fontSize
-                                    letterSpacing = letterPadding
-                                }
-                            }
-                            while (paint.measureText(line.text) < realWidth) {
-                                letterPadding += 0.01f
-                                paint = Paint().asFrameworkPaint().apply {
-                                    textSize = fontSize
-                                    letterSpacing = letterPadding
-                                }
-                            }
-                        }
-                    }
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .pointerInput(line) {
-                                myDetectTapGestures(
-                                    onTap = {
-                                        Log.d(
-                                            TAG,
-                                            "RecognizedTextPreview: textWidth =" +
-                                                    " ${paint.measureText(line.text)}, " +
-                                                    "lineLength = $realWidth, " +
-                                                    "textHeight = ${paint.textSize}, " +
-                                                    "lineHeight = $realHeight " +
-                                                    "text = ${line.text}"
-                                        )
-                                    }
-                                )
-                            }
-                    ) {
-                        drawIntoCanvas {
-                            it.nativeCanvas.drawText(
-                                line.text,
-                                boxHorizontalPadding.toFloat(),
-                                realHeight,
-                                paint
-                            )
-                        }
-                    }
-
+                    AutoResizeText(
+                        text = textToShow,
+                        realWidth = realWidth,
+                        realHeight = realHeight,
+                        horizontalPadding = boxHorizontalPadding
+                    )
                 }
             }
         }
@@ -182,7 +158,7 @@ private fun getRotationZ(line: Text.Line): Double {
 }
 
 @Composable
-private fun Number.pixelToDp(): Dp = with(LocalDensity.current) {
+fun Number.pixelToDp(): Dp = with(LocalDensity.current) {
     toFloat().toDp()
 }
 
