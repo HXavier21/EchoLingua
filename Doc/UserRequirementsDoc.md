@@ -94,7 +94,7 @@
 
 ![如果添加了此层，则该可选网域层会向界面层提供依赖项，而它自身依赖于数据层。](https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview-domain.png?hl=zh-cn)
 
-网域层负责封装复杂的业务逻辑，或者由多个 ViewModel 重复使用的简单业务逻辑。目前
+网域层负责封装复杂的业务逻辑，或者由多个 ViewModel 重复使用的简单业务逻辑。在 ***EchoLingua*** 中，网域层主要是负责整合和序列化数据库数据的DataProcess类。
 
 ### 数据层
 
@@ -102,4 +102,77 @@
 
 应用的数据层包含*业务逻辑*。业务逻辑决定应用的价值，它包含决定应用如何创建、存储和更改数据的规则。
 
-数据层由多个仓库组成，其中每个仓库都可以包含零到多个数据源。应用中处理的每种不同类型的数据都需要分别创建一个存储库类。
+数据层由多个仓库组成，其中每个仓库都可以包含零到多个数据源。应用中处理的每种不同类型的数据都需要分别创建一个存储库类。 在 ***EchoLingua*** 中，主要有本地历史记录ROOM数据库和远端服务器数据库。
+
+存储库类负责以下任务：
+
+- 向应用的其余部分公开数据。
+- 集中处理数据变化。
+- 解决多个数据源之间的冲突。
+- 对应用其余部分的数据源进行抽象化处理。
+- 包含业务逻辑。
+
+## 接口设计
+
+### 文本翻译接口
+
+#### Translator
+
+```kotlin
+fun translateWithAutoDetect(text: String, onSuccessCallback: (String) -> Unit = {})
+```
+
+### 拍照识别接口
+
+#### Text Recognizer
+
+```kotlin
+fun processImage(imageFile: Uri, language: String, refreshRecognizedText: (Text) -> Unit = {})
+```
+
+### 语音识别接口
+
+#### LibWhisper
+
+```kotlin
+suspend fun transcribeData(
+    data: FloatArray,
+    progressCallback: (Int) -> Unit = { }
+): String
+external fun initContext(modelPath: String): Long
+external fun freeContext(contextPtr: Long)
+external fun fullTranscribe(
+	contextPtr: Long,
+	language: String,
+	progressCallback: ProgressCallback? = null,
+	audioData: FloatArray
+)
+external fun getTextSegmentCount(contextPtr: Long): Int
+external fun getTextSegment(contextPtr: Long, index: Int): String
+```
+
+### 数据库接口
+
+#### DataRepository
+
+```kotlin
+fun insert(translateHistoryItem: TranslateHistoryItem): Long = dao.insert(translateHistoryItem)
+fun getAll(): List<TranslateHistoryItem> = dao.getAll()
+fun checkIfTranslated(
+    sourceLanguage: String,
+    targetLanguage: String,
+    sourceText: String,
+    targetText: String
+): List<TranslateHistoryItem> =
+    dao.checkIfTranslated(sourceLanguage, targetLanguage, sourceText, targetText)
+fun update(translateHistoryItem: TranslateHistoryItem) = dao.update(translateHistoryItem)
+fun delete(translateHistoryItem: TranslateHistoryItem) = dao.delete(translateHistoryItem)
+```
+
+### 音频处理接口
+
+#### FFmpegUtil
+
+```kotlin
+fun audioToWav(inputPath: String, outputPath: String)
+```
