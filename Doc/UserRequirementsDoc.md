@@ -14,7 +14,7 @@
 - 轻松切换输入语言和输出语言。
 - 便捷地保存和管理翻译结果。
 
-## 用户需求
+## 用户需求描述
 
 ### 功能需求
 
@@ -76,3 +76,103 @@
 
 - 提供离线翻译服务，确保在无网络环境下也能进行翻译。
 - 支持翻译历史记录查看和导出，方便用户追溯和分享翻译历史。
+
+## 应用架构
+
+### 界面层
+
+![在典型架构中，界面层的界面元素依赖于状态容器，而状态容器又依赖于来自数据层或可选网域层的类。](https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview-ui.png?hl=zh-cn)
+
+界面层（或呈现层）的作用是在屏幕上显示应用数据。每当数据发生变化时，无论是因为用户互动（例如按了某个按钮），还是因为外部输入（例如网络响应），界面都应随之更新，以反映这些变化。
+
+界面层由以下两部分组成：
+
+- UI层主要负责应用与用户的交互、界面动效的绘制管理、界面UI的更新与跳转等。在 ***EchoLingua*** 中，主要有主翻译界面、对话翻译界面、拍照翻译界面、历史记录界面、星标记录界面、用户界面、应用设置界面等界面与各式各样的组件和动画。
+- 状态容器层是以MVVM架构为核心的ViewModel类集合，负责管理界面元素与更新界面元素状态，并担任与网域层或是数据层进行交互的任务。在 ***EchoLingua*** 中，主要有TranslatePageViewModel、AudioTranslatePageViewModel、CameratranslatePageViewModel、UserPageViewModel、SettingPageViewModel等ViewModel继承类以及ModelDownloadStateHolder、LanguageSelectStateHolder等状态容器。
+
+### 网域层（待定）
+
+![如果添加了此层，则该可选网域层会向界面层提供依赖项，而它自身依赖于数据层。](https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview-domain.png?hl=zh-cn)
+
+网域层负责封装复杂的业务逻辑，或者由多个 ViewModel 重复使用的简单业务逻辑。在 ***EchoLingua*** 中，网域层主要是负责整合和序列化数据库数据的DataProcess类。
+
+### 数据层
+
+![在典型架构中，数据层的仓库会向应用的其余部分提供数据，而这些仓库则依赖于数据源。](https://developer.android.com/static/topic/libraries/architecture/images/mad-arch-overview-data.png?hl=zh-cn)
+
+应用的数据层包含*业务逻辑*。业务逻辑决定应用的价值，它包含决定应用如何创建、存储和更改数据的规则。
+
+数据层由多个仓库组成，其中每个仓库都可以包含零到多个数据源。应用中处理的每种不同类型的数据都需要分别创建一个存储库类。 在 ***EchoLingua*** 中，主要有本地历史记录ROOM数据库和远端服务器数据库。
+
+存储库类负责以下任务：
+
+- 向应用的其余部分公开数据。
+- 集中处理数据变化。
+- 解决多个数据源之间的冲突。
+- 对应用其余部分的数据源进行抽象化处理。
+- 包含业务逻辑。
+
+## 接口设计
+
+### 文本翻译接口
+
+#### Translator
+
+```kotlin
+fun translateWithAutoDetect(text: String, onSuccessCallback: (String) -> Unit = {})
+```
+
+### 拍照识别接口
+
+#### Text Recognizer
+
+```kotlin
+fun processImage(imageFile: Uri, language: String, refreshRecognizedText: (Text) -> Unit = {})
+```
+
+### 语音识别接口
+
+#### LibWhisper
+
+```kotlin
+suspend fun transcribeData(
+    data: FloatArray,
+    progressCallback: (Int) -> Unit = { }
+): String
+external fun initContext(modelPath: String): Long
+external fun freeContext(contextPtr: Long)
+external fun fullTranscribe(
+	contextPtr: Long,
+	language: String,
+	progressCallback: ProgressCallback? = null,
+	audioData: FloatArray
+)
+external fun getTextSegmentCount(contextPtr: Long): Int
+external fun getTextSegment(contextPtr: Long, index: Int): String
+```
+
+### 数据库接口
+
+#### DataRepository
+
+```kotlin
+fun insert(translateHistoryItem: TranslateHistoryItem): Long = dao.insert(translateHistoryItem)
+fun getAll(): List<TranslateHistoryItem> = dao.getAll()
+fun checkIfTranslated(
+    sourceLanguage: String,
+    targetLanguage: String,
+    sourceText: String,
+    targetText: String
+): List<TranslateHistoryItem> =
+    dao.checkIfTranslated(sourceLanguage, targetLanguage, sourceText, targetText)
+fun update(translateHistoryItem: TranslateHistoryItem) = dao.update(translateHistoryItem)
+fun delete(translateHistoryItem: TranslateHistoryItem) = dao.delete(translateHistoryItem)
+```
+
+### 音频处理接口
+
+#### FFmpegUtil
+
+```kotlin
+fun audioToWav(inputPath: String, outputPath: String)
+```
