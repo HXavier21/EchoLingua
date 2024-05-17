@@ -196,15 +196,15 @@ fun LanguageSelectPage(
                         when (selectMode) {
                             SelectMode.SOURCE -> {
                                 Text(
-                                    text = "Source Language",
-                                    style = MaterialTheme.typography.titleLarge
+                                    text = "Translate from",
+                                    style = MaterialTheme.typography.headlineMedium
                                 )
                             }
 
                             SelectMode.TARGET -> {
                                 Text(
-                                    text = "Target Language",
-                                    style = MaterialTheme.typography.titleLarge
+                                    text = "Translate to",
+                                    style = MaterialTheme.typography.headlineMedium
                                 )
                             }
                         }
@@ -311,7 +311,7 @@ fun LanguageSelectPage(
                 }
                 item {
                     Text(
-                        text = "Currently selected languages",
+                        text = "Recent languages",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(20.dp)

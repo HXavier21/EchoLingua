@@ -9,6 +9,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.filled.FlashOff
+import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
@@ -82,6 +84,7 @@ fun CameraTranslatePage(
     var isCaptured by remember { mutableStateOf(false) }
     var width by remember { mutableIntStateOf(0) }
     var height by remember { mutableIntStateOf(0) }
+    var isTorchOn by remember { mutableStateOf(false) }
 
     val cameraPermissionState =
         rememberPermissionState(permission = Manifest.permission.CAMERA, onPermissionResult = {
@@ -187,16 +190,32 @@ fun CameraTranslatePage(
                             .padding(top = 40.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val interactionSource = remember { MutableInteractionSource() }
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            modifier = Modifier.padding(10.dp),
+                            modifier = Modifier
+                                .clickable(
+                                    interactionSource = interactionSource,
+                                    indication = null
+                                ) {
+                                    onNavigateBackToTranslatePage()
+                                }
+                                .padding(10.dp),
                             tint = Color.White
                         )
                         Icon(
-                            imageVector = Icons.Default.FlashOff,
-                            contentDescription = "Flash",
-                            modifier = Modifier.padding(10.dp),
+                            imageVector = if (isTorchOn) Icons.Default.FlashOn else Icons.Default.FlashOff,
+                            contentDescription = "Torch",
+                            modifier = Modifier
+                                .clickable(
+                                    interactionSource = interactionSource,
+                                    indication = null
+                                ) {
+                                    (context as MainActivity).switchTorchState(!isTorchOn)
+                                    isTorchOn = !isTorchOn
+                                }
+                                .padding(10.dp),
                             tint = Color.White
                         )
                         Spacer(modifier = Modifier.weight(1f))

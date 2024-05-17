@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
     private var imageCapture: ImageCapture? = null
 
     private var cameraProvider: ProcessCameraProvider? = null
+    private var cameraControl: CameraControl? = null
 
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
 
@@ -148,7 +149,7 @@ class MainActivity : ComponentActivity() {
             this as LifecycleOwner, cameraSelector, useCaseGroup
         )
 
-        val cameraControl = camera?.cameraControl
+        cameraControl = camera?.cameraControl
 
         cameraControl?.let { initCameraListeners(it) }
     }
@@ -178,6 +179,12 @@ class MainActivity : ComponentActivity() {
         cameraProvider?.unbindAll()
         val previewView = findViewById<PreviewView>(R.id.camera_view)
         previewView.visibility = View.GONE
+    }
+
+    fun switchTorchState(
+        torchState: Boolean
+    ) {
+        cameraControl?.enableTorch(torchState)
     }
 
 }
