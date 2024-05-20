@@ -23,9 +23,13 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.example.echolingua.ui.navigator.MyNavigator
+import com.example.echolingua.ui.navigator.MainNavigator
+import com.example.echolingua.ui.navigator.TranslatePagesNavigator
+import com.example.echolingua.ui.page.LanguageSelectPage
+import com.example.echolingua.ui.page.LanguageSelectStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 import java.io.File
 import java.text.SimpleDateFormat
@@ -49,7 +53,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EchoLinguaTheme {
-                MyNavigator()
+                MainNavigator()
             }
         }
     }

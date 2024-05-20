@@ -18,6 +18,9 @@ object LanguageSelectStateHolder {
     private var mTargetLanguage = mutableStateOf("")
     val targetLanguage = mTargetLanguage
 
+    var isSelecting = mutableStateOf(false)
+    var selectMode = mutableStateOf(SelectMode.SOURCE)
+
     val languageMap =
         TranslateLanguage.getAllLanguages().associateWith { Locale.forLanguageTag(it).displayName }
 
@@ -60,9 +63,11 @@ object LanguageSelectStateHolder {
             "" -> {
                 "Source"
             }
+
             "detect" -> {
                 "Auto detect"
             }
+
             else -> {
                 languageMap[mSourceLanguage.value] ?: ""
             }
@@ -74,9 +79,15 @@ object LanguageSelectStateHolder {
             "" -> {
                 "Target"
             }
+
             else -> {
                 languageMap[mTargetLanguage.value] ?: ""
             }
         }
+    }
+
+    fun navigateToLanguageSelectPage(selectMode: SelectMode) {
+        isSelecting.value = true
+        this.selectMode.value = selectMode
     }
 }

@@ -44,6 +44,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -74,8 +75,7 @@ private const val TAG = "CameraTranslatePage"
 fun CameraTranslatePage(
     cameraTranslatePageViewModel: CameraTranslatePageViewModel = viewModel(),
     onNavigateBackToTranslatePage: () -> Unit = {},
-    onNavigateToSourceLanguageSelectPage: (SelectMode) -> Unit = {},
-    onNavigateToTargetLanguageSelectPage: (SelectMode) -> Unit = {}
+    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {}
 ) {
     val context = LocalContext.current
     val imageFile by cameraTranslatePageViewModel.imageFileFlow.collectAsState()
@@ -263,12 +263,10 @@ fun CameraTranslatePage(
                     sourceLanguage = LanguageSelectStateHolder.getSourceLanguageDisplayName(),
                     targetLanguage = LanguageSelectStateHolder.getTargetLanguageDisplayName(),
                     onSourceLanguageClick = {
-                        (context as MainActivity).stopCamera()
-                        onNavigateToSourceLanguageSelectPage(SelectMode.SOURCE)
+                        onNavigateToLanguageSelectPage(SelectMode.SOURCE)
                     },
                     onTargetLanguageClick = {
-                        (context as MainActivity).stopCamera()
-                        onNavigateToTargetLanguageSelectPage(SelectMode.TARGET)
+                        onNavigateToLanguageSelectPage(SelectMode.TARGET)
                     },
                     onSwapIconClick = {
                         LanguageSelectStateHolder.swapLanguage()
@@ -292,12 +290,13 @@ fun CameraTranslatePage(
                                     contentDescription = "Pick image",
                                     tint = Color.White,
                                     modifier = Modifier
-                                        .clickable {
-                                            mediaPermissionState.launchPermissionRequest()
-                                        }
                                         .background(
                                             Color.Black.copy(alpha = 0.8f), CircleShape
                                         )
+                                        .clip(CircleShape)
+                                        .clickable {
+                                            mediaPermissionState.launchPermissionRequest()
+                                        }
                                         .padding(15.dp))
                             }
 
