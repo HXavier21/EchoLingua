@@ -18,11 +18,6 @@ def hello():
     return "EchoLingua,gogogo!!!"
 
 
-@app.route('/0.o')
-def vivo50():
-    return "hinanawi tenshi，vivo50"
-
-
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -48,7 +43,7 @@ def get_user_history():
 
 
 # API 路由，接收客户端序列化的本地历史记录列表并合并到数据库
-@app.route('/merge_history', methods=['POST'])
+@app.route('/merge_history', methods=['PUT'])
 def merge_history():
     email = request.args.get('email')
     data = request.get_json()
@@ -59,7 +54,7 @@ def merge_history():
 @app.route('/translate', methods=['POST'])
 def translate():
     data = request.get_json()
-    email = data.get('email')
+    email = request.args.get('email')
     message = get_tencent_service.get_tencent_service(data, email)
     return message
 
