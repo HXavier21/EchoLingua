@@ -1,10 +1,7 @@
-import json
-
 from flask import jsonify
 from sqlalchemy.exc import IntegrityError
 
-from models import db, User, TranslationHistory
-import models
+from get_service.mysql_database import db, User, TranslationHistory
 
 
 def get_user_history(email):
@@ -31,10 +28,11 @@ def get_user_history(email):
     result = {
         'history': serialized_history
     }
-    return result,200
+    return result, 200
 
 
-def merge_history(data):
+def merge_history(email, data):
+    user = User.query.filter_by(email=email).first()
     serialized_history_from_client = data.get('history', [])
     if not serialized_history_from_client:
         return jsonify({'error': 'No history data provided'}), 400
@@ -43,24 +41,30 @@ def merge_history(data):
     error_records = []
 
     # 遍历客户端序列化的历史记录列表
-    for record_list in serialized_history_from_client:
-        if not isinstance(record_list, list):
-            error_records.append({'error': 'Invalid history data format'})
+    for record_dict in serialized_history_from_client:
+        # 判断是否重复
+        is_user_history = TranslationHistory.query.filter_by(source_text=record_dict.get('source_text', ''),
+                                                             target_text=record_dict.get('target_text', ''),
+                                                             timestamp=record_dict.get('timestamp', '')).first()
+        if is_user_history:
+            error_records.append(record_dict)
             continue
 
-        for record_dict in record_list:
-            record = TranslationHistory(
-                source_text=record_dict.get('source_text', ''),
-                target_text=record_dict.get('target_text', ''),
-                user_id=record_dict.get('user_id', 0)
-            )
-            try:
-                db.session.add(record)
-                db.session.commit()
-                success_records.append(record_dict)
-            except IntegrityError:
-                db.session.rollback()
-                error_records.append(record_dict)
+        record = TranslationHistory(
+            user_id=user.id,
+            source_language=record_dict.get('source_language', ''),
+            source_text=record_dict.get('source_text', ''),
+            target_language=record_dict.get('target_language', ''),
+            target_text=record_dict.get('target_text', ''),
+            timestamp=record_dict.get('timestamp')
+        )
+        try:
+            db.session.add(record)
+            db.session.commit()
+            success_records.append(record_dict)
+        except IntegrityError:
+            db.session.rollback()
+            error_records.append(record_dict)
 
     return jsonify({
         'success': success_records,

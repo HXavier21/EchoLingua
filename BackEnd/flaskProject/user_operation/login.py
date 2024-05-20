@@ -1,6 +1,6 @@
 from flask import jsonify
 
-from models import User
+from get_service.mysql_database import User
 
 
 def login(data):

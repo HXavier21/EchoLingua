@@ -1,6 +1,6 @@
 from flask import jsonify
-from models import db, User, TranslationHistory
-import models
+from get_service.mysql_database import User
+from get_service import mysql_database
 
 
 def register(data):
@@ -14,5 +14,5 @@ def register(data):
     if existing_user:
         return jsonify({'message': 'Email already registered'}), 400
     # 创建新用户并保存到数据库
-    user_id = models.create_user(email, password)
+    user_id = mysql_database.create_user(email, password)
     return jsonify({'message': 'User registered successfully', 'user_id': user_id})

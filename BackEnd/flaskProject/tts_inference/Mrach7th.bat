@@ -1,0 +1,3 @@
+cd D:\code\SoftwareEngineering\TTS\GPT-SoVITS-beta0217\GPT-SoVITS-beta0217fix
+.\runtime\python.exe api2.py -s "D:\code\SoftwareEngineering\TTS\models\March7th\March7th_e15_s4875.pth" -g "D:\code\SoftwareEngineering\TTS\models\March7th\March7th-e10.ckpt" -dr "D:\code\SoftwareEngineering\TTS\models\March7th\reference_voice\说话-名字是我自己取的，大家也叫我三月、小三月…你呢？你想叫我什么？.wav" -dt "名字是我自己取的，大家也叫我三月、小三月…你呢？你想叫我什么？" -dl "zh" -p 9900
+pause

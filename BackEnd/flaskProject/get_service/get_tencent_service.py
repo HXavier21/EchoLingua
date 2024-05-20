@@ -8,7 +8,7 @@ from http.client import HTTPSConnection
 
 from flask import jsonify
 
-from models import db, User, TranslationHistory
+from get_service.mysql_database import db, User, TranslationHistory
 
 
 def sign(key, msg):
@@ -23,9 +23,9 @@ def get_tencent_service(data, email):
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({'error': 'User not found'}), 404
-    with open("D:\code\SoftwareEngineering\secret_id.txt",'r') as file:
+    with open("D:/code/SoftwareEngineering/secret_id.txt", 'r') as file:
         secret_id = file.read()
-    with open("D:\code\SoftwareEngineering\secret_key.txt",'r') as file:
+    with open("D:/code/SoftwareEngineering/secret_key.txt", 'r') as file:
         secret_key = file.read()
     token = ""
 
