@@ -30,10 +30,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.R
+import com.example.echolingua.ui.component.TextInput
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @Composable
-fun Interface2(
+fun MainTranslateInputPage(
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -47,7 +48,21 @@ fun Interface2(
                 .navigationBarsPadding()
                 .imePadding()
         ) {
-            NavigationBar2()
+            Row(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxWidth()
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BackIcon()
+                Spacer(modifier = Modifier.weight(1f))
+                LocationMoveIcon()
+                Spacer(modifier = Modifier.weight(0.1f))
+                HistoryIcon()
+                Spacer(modifier = Modifier.weight(0.1f))
+                com.example.echolingua.ui.page.FeedbackIcon()
+            }
             TextInput(
                 modifier = Modifier.weight(1f)
             )
@@ -59,31 +74,12 @@ fun Interface2(
 }
 
 
-@Composable
-fun NavigationBar2() {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        ReturnIcon()
-        Spacer(modifier = Modifier.weight(1f))
-        LocationMoveIcon()
-        Spacer(modifier = Modifier.weight(0.1f))
-        HistoryIcon()
-        Spacer(modifier = Modifier.weight(0.1f))
-        com.example.echolingua.ui.page.FeedbackIcon()
-    }
-}
-
 
 @Composable
-fun ReturnIcon() {
+fun BackIcon() {
     Icon(
         Icons.AutoMirrored.Filled.ArrowBack,
-        contentDescription = "Return",
+        contentDescription = "Back",
         modifier = Modifier
             .padding(start = 10.dp)
     )
@@ -135,7 +131,7 @@ fun FeedbackIcon() {
 @Composable
 fun InterfaceInputPreview() {
     EchoLinguaTheme {
-        Interface2()
+        MainTranslateInputPage()
     }
 }
 
@@ -146,6 +142,6 @@ fun InterfaceInputPreview() {
 @Composable
 fun DarkModeInterfaceInputPreview() {
     EchoLinguaTheme {
-        Interface2()
+        MainTranslateInputPage()
     }
 }
