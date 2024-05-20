@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,6 +58,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.echolingua.MainActivity
 import com.example.echolingua.R
@@ -66,6 +68,9 @@ import com.example.echolingua.util.TextRecognizer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.mlkit.nl.translate.TranslateLanguage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 private const val TAG = "CameraTranslatePage"
@@ -85,7 +90,7 @@ fun CameraTranslatePage(
     var width by remember { mutableIntStateOf(0) }
     var height by remember { mutableIntStateOf(0) }
     var isTorchOn by remember { mutableStateOf(false) }
-
+    val coroutine = rememberCoroutineScope()
     val cameraPermissionState =
         rememberPermissionState(permission = Manifest.permission.CAMERA, onPermissionResult = {
             if (it) {
@@ -98,23 +103,31 @@ fun CameraTranslatePage(
         else Manifest.permission.READ_EXTERNAL_STORAGE, onPermissionResult = {
             (context as MainActivity).pickMedia(onSuccess = { uri ->
                 Log.d(TAG, "CameraTranslatePage: $uri")
-                context.contentResolver.openInputStream(uri)?.use {
-                    File.createTempFile("temp", ".jpeg").apply {
-                        writeBytes(it.readBytes())
+                coroutine.launch {
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.use {
+                            File.createTempFile("temp", ".jpeg").apply {
+                                writeBytes(it.readBytes())
+                            }
+                        }?.let {
+                            cameraTranslatePageViewModel.setImageFile(it)
+                        }
                     }
-                }?.let {
-                    cameraTranslatePageViewModel.setImageFile(it)
+                    withContext(Dispatchers.Default) {
+                        TextRecognizer.processImage(
+                            imageFile = uri,
+                            language = TranslateLanguage.CHINESE,
+                            refreshRecognizedText = {
+                                cameraTranslatePageViewModel.setRecognizedText(
+                                    it
+                                )
+                            })
+                    }
+                    withContext(Dispatchers.Main) {
+                        isCaptured = true
+                        context.stopCamera()
+                    }
                 }
-                TextRecognizer.processImage(
-                    imageFile = uri,
-                    language = TranslateLanguage.CHINESE,
-                    refreshRecognizedText = {
-                        cameraTranslatePageViewModel.setRecognizedText(
-                            it
-                        )
-                    })
-                isCaptured = true
-                context.stopCamera()
             }, onFailure = {
                 Log.d(TAG, "CameraTranslatePage: No image picked")
                 Toast.makeText(

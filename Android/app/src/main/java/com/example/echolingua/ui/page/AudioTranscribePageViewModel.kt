@@ -13,7 +13,7 @@ import com.example.echolingua.ffmpeg.FFmpegUtil
 import com.example.echolingua.whisper.WhisperContext
 import com.example.echolingua.media.decodeWaveFile
 import com.example.echolingua.network.DownloadStatus
-import com.example.echolingua.network.downloadModel
+import com.example.echolingua.network.downloadWhisperModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,7 +61,7 @@ class AudioTranscribePageViewModel : ViewModel() {
             val models = modelsPath.list()
 
             if (models == null || !models.contains("$modelName.bin")) {
-                downloadModel(
+                downloadWhisperModel(
                     fileUrl = fileUrl,
                     destinationPath = destinationPath,
                 ).collect { status ->

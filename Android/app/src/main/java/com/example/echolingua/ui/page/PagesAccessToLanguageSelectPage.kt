@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -21,11 +20,18 @@ fun PagesAccessToLanguageSelectPage(
         TranslatePagesNavigator()
         AnimatedVisibility(
             visible = isSelecting,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
+            enter = fadeIn() + scaleIn(
+                initialScale = 0.9f
+            ),
+            exit = fadeOut()
         ) {
             LanguageSelectPage(
-                onBackClick = { LanguageSelectStateHolder.isSelecting.value = false }
+                selectMode = LanguageSelectStateHolder.selectMode.value,
+                onBackClick = { LanguageSelectStateHolder.isSelecting.value = false },
+                onModelStateClick = {
+                    TranslateModelStateHolder.currentLanguage.value = it
+                    TranslateModelStateHolder.isManagingModel.value = true
+                }
             )
         }
     }
