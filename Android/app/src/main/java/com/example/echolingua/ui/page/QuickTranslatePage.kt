@@ -36,262 +36,196 @@ import com.example.echolingua.R
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @Composable
-fun QuickTranslatePage(state:Number) {
-    Column{
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSurface,
-        ),
-        modifier = Modifier
-            .padding(10.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(color = MaterialTheme.colorScheme.onSurface)
-            .fillMaxWidth()
-    ) {
-        Row(
+fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateClick:()->Unit={}) {
+    Column {
+        ElevatedCard(
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 10.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.onSurface,
+            ),
             modifier = Modifier
+                .padding(10.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(color = MaterialTheme.colorScheme.onSurface)
                 .fillMaxWidth()
-                .padding(top = 10.dp, start = 10.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.translate),
-                contentDescription = null,
-                tint = Color.White,
+            Row(
                 modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(25.dp)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "EchoLingua翻译",
-                textAlign = TextAlign.Center,
-                color = Color.White,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.Filled.MoreVert,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(start = 20.dp, end = 20.dp)
-                    .size(20.dp)
-            )
+                    .fillMaxWidth()
+                    .padding(top = 10.dp, start = 10.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.translate),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                        .size(25.dp)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "EchoLingua翻译",
+                    textAlign = TextAlign.Center,
+                    color = Color.White,
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(start = 20.dp, end = 20.dp)
+                        .size(20.dp)
+                )
+            }
+            if (state == 1) {
+                Row {
+                    Text(
+                        text = "中文(简体)   - 检测到的语言",
+                        color = Color.White,
+                        modifier = Modifier
+                            .padding(top = 20.dp, start = 20.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        painter = painterResource(id = R.drawable.paste),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .padding(end = 20.dp, top = 20.dp)
+                            .size(25.dp)
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.report),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier
+                            .padding(end = 20.dp, top = 20.dp)
+                            .size(25.dp)
+                    )
+                }
+                Text(
+                    text = "身体",
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(top = 10.dp, start = 20.dp)
+                )
+                Divider(
+                    color = Color.DarkGray,
+                    modifier = Modifier.padding(start = 100.dp, top = 20.dp, end = 100.dp)
+                )
+                Row {
+                    Text(
+                        text = "英语",
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            .padding(top = 20.dp, start = 20.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        painter = painterResource(id = R.drawable.paste),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            .padding(end = 20.dp, top = 20.dp)
+                            .size(25.dp)
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.report),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        modifier = Modifier
+                            .padding(end = 20.dp, top = 20.dp)
+                            .size(25.dp)
+                    )
+                }
+                Text(
+                    text = "human body",
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    modifier = Modifier
+                        .padding(top = 10.dp, start = 20.dp, bottom = 20.dp)
+                )
+            }else{
+                Text(
+                    text = "检测语言",
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(top = 20.dp, start = 20.dp)
+                )
+                var text by remember {
+                    mutableStateOf("")
+                }
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    modifier = Modifier
+                        .padding(start = 20.dp, top = 10.dp),
+                    label = {
+                        Text(
+                            "输入文字",
+                            color = Color.White,
+                        )
+                    }
+                )
+                ElevatedButton(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier
+                        .padding(start = 20.dp, top = 20.dp, bottom = 20.dp)
+                )
+                {
+                    Text(
+                        "粘贴"
+                    )
+                }
+            }
         }
-
-        Row {
-            Text(
-                text = "中文(简体)   - 检测到的语言",
-                color = Color.White,
+        if (state == 1) {
+            Row(
                 modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                painter = painterResource(id = R.drawable.paste),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(end = 20.dp, top = 20.dp)
-                    .size(25.dp)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.report),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(end = 20.dp, top = 20.dp)
-                    .size(25.dp)
-            )
+                    .fillMaxWidth()
+            ) {
+                ElevatedButton(
+                    onClick = {
+                      onClearClick()
+                    },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
+                {
+                    Text(
+                        "清除"
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                ElevatedButton(
+                    onClick = {
+                        onNewTranslateClick()
+                    },
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                )
+                {
+                    Text(
+                        "新翻译",
+                        color = Color.Black
+                    )
+                }
+            }
         }
-        Text(
-            text = "身体",
-            color = Color.White,
-            modifier = Modifier
-                .padding(top = 10.dp, start = 20.dp)
-        )
-        Divider(
-            color = Color.DarkGray,
-            modifier = Modifier.padding(start = 100.dp, top = 20.dp, end = 100.dp)
-        )
-        Row {
-            Text(
-                text = "英语",
-                color = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Icon(
-                painter = painterResource(id = R.drawable.paste),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier
-                    .padding(end = 20.dp, top = 20.dp)
-                    .size(25.dp)
-            )
-            Icon(
-                painter = painterResource(id = R.drawable.report),
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primaryContainer,
-                modifier = Modifier
-                    .padding(end = 20.dp, top = 20.dp)
-                    .size(25.dp)
-            )
-        }
-        Text(
-            text = "human body",
-            color = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier
-                .padding(top = 10.dp, start = 20.dp, bottom = 20.dp)
-        )
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-    ) {
-        ClearButton()
-        Spacer(modifier = Modifier.weight(1f))
-        NewTranslateButton()
-    }
-}
-}
-
-@Composable
-fun ClearButton() {
-    ElevatedButton(
-        onClick = {
-
-        },
-        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSurfaceVariant),
-        modifier = Modifier
-            .padding(start = 10.dp)
-    )
-    {
-        Text(
-            "清除"
-        )
-    }
-}
-
-@Composable
-fun NewTranslateButton() {
-    ElevatedButton(
-        onClick = { },
-        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
-        modifier = Modifier
-            .padding(end = 10.dp)
-    )
-    {
-        Text(
-            "新翻译",
-            color = Color.Black
-        )
     }
 }
 
 
 
 @Composable
-fun RightIcon() {
-    Icon(
-        imageVector = Icons.Filled.MoreVert,
-        contentDescription = null,
-        tint = Color.White,
-        modifier = Modifier
-            .padding(start = 20.dp, end = 20.dp)
-            .size(20.dp)
-
-    )
-
-}
-
-
-@Composable
-fun ElevatedCard() {
-    ElevatedCard(
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 10.dp
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.onSurface,
-        ),
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(color = MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(10.dp)
-    ) {
-        Row ( modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 10.dp, start = 10.dp)
-        ){
-            Icon(
-                painter = painterResource(id = R.drawable.translate),
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(start = 10.dp)
-                    .size(25.dp)
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                text = "EchoLingua翻译",
-                textAlign = TextAlign.Center,
-                color = Color.White,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            RightIcon()
-        }
-        Text(
-            text = "中文(简体)   - 检测到的语言",
-            color = Color.White,
-            modifier = Modifier
-                .padding(top = 20.dp, start = 20.dp)
-        )
-        InputBox()
-        PasteButton()
-    }
-}
-@Composable
-fun InputBox() {
-    var text by remember {
-        mutableStateOf("")
-    }
-    OutlinedTextField(
-        value = text,
-        onValueChange = {text=it},
-        modifier = Modifier
-            .padding(start = 20.dp, top = 10.dp),
-        label = {
-            Text(
-                "输入文字",
-                color= Color.White,
-            )
-        }
-    )
-}
-@Composable
-fun StateChoose(){
-    var state by rememberSaveable { mutableStateOf(1) }
-    QuickTranslatePage(state=state)
-}
-@Composable
-fun PasteButton() {
-    ElevatedButton(
-        onClick = {  },
-        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSurfaceVariant),
-        modifier = Modifier
-            .padding(start = 20.dp, top = 20.dp, bottom = 20.dp)
-    )
-    {
-        Text(
-            "粘贴"
-        )
-    }
+fun StateChoose() {
+    var state by remember { mutableStateOf(0) }
+    QuickTranslatePage(state = state, onClearClick = {state=0}, onNewTranslateClick = {state=0})
 }
 
 
