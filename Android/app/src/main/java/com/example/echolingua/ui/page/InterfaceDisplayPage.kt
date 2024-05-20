@@ -37,7 +37,7 @@ import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun Interface3(
+fun InterfaceDisplayPage(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -61,91 +61,96 @@ fun Interface3(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                NavigationBar3()
-                DisplayLanguage1()
+                Row(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface)
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BackIcon()
+                    Spacer(modifier = Modifier.weight(1f))
+                    HistoryIcon()
+                    Spacer(modifier = Modifier.weight(0.1f))
+                    KeyTranslationsIcon()
+                    Spacer(modifier = Modifier.weight(0.1f))
+                    FeedbackIcon()
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.padding(start = 10.dp)
+                    ) {
+                        Text(
+                            text = "英语",
+                        )
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Text(
+                            text = "炫酷",
+                            fontSize = 30.sp,
+                        )
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Report()
+                            Spacer(modifier = Modifier.weight(1f))
+                            CopyText()
+                        }
+                    }
+                }
                 Divider(
                     color = Color(0xFF424758),
                     modifier = Modifier.padding(start = 100.dp, end = 100.dp)
                 )
                 Spacer(modifier = Modifier.size(20.dp))
-                DisplayLanguage2()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.padding(start = 10.dp)
+                    ) {
+                        Text(
+                            text = "中文（简体）",
+                        )
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Text(
+                            text = "炫酷",
+                            fontSize = 30.sp,
+                        )
+                        Text(
+                            text = "Xuan ku",
+                            fontSize = 13.sp,
+                        )
+                        Spacer(modifier = Modifier.size(20.dp))
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Report()
+                            Spacer(modifier = Modifier.weight(1f))
+                            CopyText()
+                            Spacer(modifier = Modifier.weight(0.2f))
+                            SelectText()
+                        }
+                    }
+                }
             }
         }
     }
 
 }
 
-@Composable
-fun DisplayLanguage1() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            modifier = Modifier.padding(start = 10.dp)
-        ) {
-            Text(
-                text = "英语",
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-            Text(
-                text = "炫酷",
-                fontSize = 30.sp,
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Report()
-                Spacer(modifier = Modifier.weight(1f))
-                CopyText()
-            }
-        }
-    }
-}
-
-@Composable
-fun DisplayLanguage2() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(
-            modifier = Modifier.padding(start = 10.dp)
-        ) {
-            Text(
-                text = "中文（简体）",
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-            Text(
-                text = "炫酷",
-                fontSize = 30.sp,
-            )
-            Text(
-                text = "Xuan ku",
-                fontSize = 13.sp,
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Report()
-                Spacer(modifier = Modifier.weight(1f))
-                CopyText()
-                Spacer(modifier = Modifier.weight(0.2f))
-                SelectText()
-            }
-        }
-    }
-}
 
 @Composable
 fun SelectText() {
@@ -202,30 +207,12 @@ fun Report() {
     )
 }
 
-@Composable
-fun NavigationBar3() {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        BackIcon()
-        Spacer(modifier = Modifier.weight(1f))
-        HistoryIcon()
-        Spacer(modifier = Modifier.weight(0.1f))
-        KeyTranslationsIcon()
-        Spacer(modifier = Modifier.weight(0.1f))
-        FeedbackIcon()
-    }
-}
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     EchoLinguaTheme {
-        Interface3()
+        InterfaceDisplayPage()
     }
 }
 
@@ -236,6 +223,6 @@ fun GreetingPreview() {
 @Composable
 fun DarkModeGreetingPreview() {
     EchoLinguaTheme {
-        Interface3()
+        InterfaceDisplayPage()
     }
 }
