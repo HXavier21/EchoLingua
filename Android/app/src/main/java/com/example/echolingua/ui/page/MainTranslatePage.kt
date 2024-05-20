@@ -19,6 +19,9 @@ import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.twotone.Mic
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,18 +53,6 @@ fun KeyTranslationsIcon() {
 }
 
 @Composable
-fun AccountImage() {
-    Image(
-        painter = painterResource(R.drawable.aniya),
-        contentDescription = null,
-        modifier = Modifier
-            .padding(end = 10.dp)
-            .size(30.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
 fun MainTranslatePage(
     modifier: Modifier = Modifier
 ) {
@@ -78,14 +70,26 @@ fun MainTranslatePage(
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                KeyTranslationsIcon()
+                Icon(
+                    Icons.Filled.Star,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = "EchoLingua翻译",
                     modifier = Modifier
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                AccountImage()
+                Image(
+                    painter = painterResource(R.drawable.aniya),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .size(30.dp)
+                        .clip(CircleShape)
+                )
             }
             TextInput(
                 modifier = Modifier.weight(1f)
@@ -93,9 +97,117 @@ fun MainTranslatePage(
 
             Spacer(modifier = Modifier.size(10.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                SwitchLanguage()
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        shape = MaterialTheme.shapes.small,
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface)
+                    ) {
+                        Text(
+                            text = "中文",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .padding(horizontal = 25.dp)
+                        )
+                    }
+                    Icon(
+                        Icons.Filled.ImportExport,
+                        "swap language",
+                        modifier = Modifier
+                            .graphicsLayer { this.rotationZ = 90f }
+                            .padding(horizontal = 10.dp)
+                            .size(30.dp)
+
+                    )
+                    Button(
+                        onClick = { /*TODO*/ },
+                        shape = MaterialTheme.shapes.small,
+                        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface)
+                    ) {
+                        Text(
+                            text = "英文",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .padding(horizontal = 25.dp)
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.size(24.dp))
-                TranslationAssistance()
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(start = 40.dp)
+                    ) {
+                        LargeFloatingActionButton(
+                            onClick = { /*TODO*/ },
+                            shape = CircleShape,
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .size(50.dp)
+                        ) {
+                            Icon(
+                                Icons.Outlined.Group,
+                                "dialogue",
+                                modifier = Modifier
+                                    .size(24.dp)
+                            )
+                        }
+                        Text(
+                            text = "对话",
+                            fontSize = 10.sp,
+                            modifier = Modifier
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+                    LargeFloatingActionButton(
+                        onClick = { /*TODO*/ },
+                        shape = CircleShape,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .offset(y = (-10).dp),
+                    ) {
+                        Icon(
+                            Icons.TwoTone.Mic,
+                            "MicPhone",
+                            modifier = Modifier.size(35.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(end = 40.dp)
+                    ) {
+                        LargeFloatingActionButton(
+                            onClick = { /*TODO*/ },
+                            shape = CircleShape,
+                            containerColor = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier
+                                .size(50.dp)
+                        ) {
+                            Icon(
+                                Icons.Outlined.CameraAlt,
+                                "camera",
+                                modifier = Modifier
+                                    .size(24.dp)
+                            )
+                        }
+                        Text(
+                            text = "相机",
+                            fontSize = 10.sp
+                        )
+                    }
+                }
             }
         }
     }
@@ -117,37 +229,27 @@ fun SwitchLanguage() {
             modifier = Modifier
                 .graphicsLayer { this.rotationZ = 90f }
                 .padding(horizontal = 10.dp)
+                .size(30.dp)
 
         )
         TargetLanguageButton()
     }
 }
 
-@Composable
-fun TranslationAssistance() {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-
-        DialogueButton()
-        Spacer(modifier = Modifier.weight(1f))
-        MicButton()
-        Spacer(modifier = Modifier.weight(1f))
-        CameraButton()
-    }
-}
 
 @Composable
 fun SourceLanguageBotton() {
     Button(
         onClick = { /*TODO*/ },
-        shape = MaterialTheme.shapes.small
+        shape = MaterialTheme.shapes.small,
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
             text = "中文",
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
-                .padding(8.dp)
-                .padding(horizontal = 10.dp)
+                .padding(10.dp)
+                .padding(horizontal = 25.dp)
         )
     }
 }
@@ -156,88 +258,19 @@ fun SourceLanguageBotton() {
 fun TargetLanguageButton() {
     Button(
         onClick = { /*TODO*/ },
-        shape = MaterialTheme.shapes.small
+        shape = MaterialTheme.shapes.small,
+        colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface)
     ) {
         Text(
             text = "英文",
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier
-                .padding(8.dp)
-                .padding(horizontal = 10.dp)
+                .padding(10.dp)
+                .padding(horizontal = 25.dp)
         )
     }
 }
 
-@Composable
-fun MicButton() {
-    LargeFloatingActionButton(
-        onClick = { /*TODO*/ },
-        shape = CircleShape,
-        modifier = Modifier
-            .size(80.dp)
-            .offset(y = (-10).dp),
-    ) {
-        Icon(
-            Icons.TwoTone.Mic,
-            "MicPhone",
-            modifier = Modifier.size(30.dp)
-        )
-    }
-}
-
-@Composable
-fun DialogueButton() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(start = 40.dp)
-    ) {
-        LargeFloatingActionButton(
-            onClick = { /*TODO*/ },
-            shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.surfaceTint,
-            modifier = Modifier
-                .size(40.dp)
-        ) {
-            Icon(
-                Icons.Outlined.Group,
-                "dialogue",
-                modifier = Modifier
-                    .size(24.dp)
-            )
-        }
-        Text(
-            text = "对话",
-            fontSize = 10.sp,
-            modifier = Modifier
-        )
-    }
-}
-
-@Composable
-fun CameraButton() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(end = 40.dp)
-    ) {
-        LargeFloatingActionButton(
-            onClick = { /*TODO*/ },
-            shape = CircleShape,
-            containerColor = MaterialTheme.colorScheme.surfaceTint,
-            modifier = Modifier
-                .size(40.dp)
-        ) {
-            Icon(
-                Icons.Outlined.CameraAlt,
-                "camera",
-                modifier = Modifier
-                    .size(24.dp)
-            )
-        }
-        Text(
-            text = "相机",
-            fontSize = 10.sp
-        )
-    }
-}
 
 @Preview(showBackground = true)
 @Composable

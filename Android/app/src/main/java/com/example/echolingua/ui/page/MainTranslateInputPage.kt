@@ -55,13 +55,40 @@ fun MainTranslateInputPage(
                     .padding(10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BackIcon()
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    modifier = Modifier
+                        .padding(start = 10.dp)
+                )
                 Spacer(modifier = Modifier.weight(1f))
-                LocationMoveIcon()
+                val colorFilter = if (isSystemInDarkTheme()) {
+                    ColorFilter.tint(Color.White) // Set color for dark theme
+                } else {
+                    ColorFilter.tint(Color.Black) // Set color for light theme
+                }
+                Image(
+                    painter = painterResource(id = R.drawable.round_trip_arrow),
+                    contentDescription = "history Icon",
+                    colorFilter = colorFilter,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                )
                 Spacer(modifier = Modifier.weight(0.1f))
-                HistoryIcon()
+                Image(
+                    painter = painterResource(id = R.drawable.historyicon),
+                    contentDescription = "history Icon",
+                    colorFilter = colorFilter,
+                    modifier = Modifier
+                        .size(20.dp)
+                        .clip(CircleShape)
+                )
                 Spacer(modifier = Modifier.weight(0.1f))
-                com.example.echolingua.ui.page.FeedbackIcon()
+                Icon(
+                        Icons.Filled.MoreVert,
+                contentDescription = "feedback",
+                )
             }
             TextInput(
                 modifier = Modifier.weight(1f)
@@ -73,59 +100,6 @@ fun MainTranslateInputPage(
 
 }
 
-
-
-@Composable
-fun BackIcon() {
-    Icon(
-        Icons.AutoMirrored.Filled.ArrowBack,
-        contentDescription = "Back",
-        modifier = Modifier
-            .padding(start = 10.dp)
-    )
-}
-
-@Composable
-fun LocationMoveIcon() {
-    val colorFilter = if (isSystemInDarkTheme()) {
-        ColorFilter.tint(Color.White) // Set color for dark theme
-    } else {
-        ColorFilter.tint(Color.Black) // Set color for light theme
-    }
-    Image(
-        painter = painterResource(id = R.drawable.round_trip_arrow),
-        contentDescription = "history Icon",
-        colorFilter = colorFilter,
-        modifier = Modifier
-            .size(20.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun HistoryIcon() {
-    val colorFilter = if (isSystemInDarkTheme()) {
-        ColorFilter.tint(Color.White) // Set color for dark theme
-    } else {
-        ColorFilter.tint(Color.Black) // Set color for light theme
-    }
-    Image(
-        painter = painterResource(id = R.drawable.historyicon),
-        contentDescription = "history Icon",
-        colorFilter = colorFilter,
-        modifier = Modifier
-            .size(20.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun FeedbackIcon() {
-    Icon(
-        Icons.Filled.MoreVert,
-        contentDescription = "feedback",
-    )
-}
 
 @Preview(showBackground = true)
 @Composable

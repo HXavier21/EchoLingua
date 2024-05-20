@@ -14,7 +14,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,7 +39,7 @@ import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun InterfaceDisplayPage(
+fun TranslateResultDisplayPage(
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -68,13 +70,33 @@ fun InterfaceDisplayPage(
                         .padding(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BackIcon()
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier
+                            .padding(start = 10.dp)
+                    )
                     Spacer(modifier = Modifier.weight(1f))
-                    HistoryIcon()
+                    val colorFilter = if (isSystemInDarkTheme()) {
+                        ColorFilter.tint(Color.White) // Set color for dark theme
+                    } else {
+                        ColorFilter.tint(Color.Black) // Set color for light theme
+                    }
+                    Image(
+                        painter = painterResource(id = R.drawable.historyicon),
+                        contentDescription = "history Icon",
+                        colorFilter = colorFilter,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clip(CircleShape)
+                    )
                     Spacer(modifier = Modifier.weight(0.1f))
                     KeyTranslationsIcon()
                     Spacer(modifier = Modifier.weight(0.1f))
-                    FeedbackIcon()
+                    Icon(
+                        Icons.Filled.MoreVert,
+                        contentDescription = "feedback",
+                    )
                 }
                 Row(
                     modifier = Modifier
@@ -99,9 +121,31 @@ fun InterfaceDisplayPage(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Report()
+                            val colorFilter = if (isSystemInDarkTheme()) {
+                                ColorFilter.tint(Color.White) // Set color for dark theme
+                            } else {
+                                ColorFilter.tint(Color.Black) // Set color for light theme
+                            }
+                            Image(
+                                painterResource(id = R.drawable.report),
+                                contentDescription = "report",
+                                colorFilter = colorFilter,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                            )
                             Spacer(modifier = Modifier.weight(1f))
-                            CopyText()
+
+                            Image(
+                                painterResource(
+                                    id = R.drawable.paste
+                                ),
+                                contentDescription = "copy",
+                                colorFilter = colorFilter,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                            )
                         }
                     }
                 }
@@ -137,11 +181,42 @@ fun InterfaceDisplayPage(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Report()
+                            val colorFilter = if (isSystemInDarkTheme()) {
+                                ColorFilter.tint(Color.White) // Set color for dark theme
+                            } else {
+                                ColorFilter.tint(Color.Black) // Set color for light theme
+                            }
+                            Image(
+                                painterResource(id = R.drawable.report),
+                                contentDescription = "report",
+                                colorFilter = colorFilter,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                            )
                             Spacer(modifier = Modifier.weight(1f))
-                            CopyText()
+
+                            Image(
+                                painterResource(
+                                    id = R.drawable.paste
+                                ),
+                                contentDescription = "copy",
+                                colorFilter = colorFilter,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                            )
                             Spacer(modifier = Modifier.weight(0.2f))
-                            SelectText()
+                            Image(
+                                painterResource(
+                                    id = R.drawable.round_trip_arrow
+                                ),
+                                contentDescription = "round_trip",
+                                colorFilter = colorFilter,
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                            )
                         }
                     }
                 }
@@ -152,67 +227,11 @@ fun InterfaceDisplayPage(
 }
 
 
-@Composable
-fun SelectText() {
-    val colorFilter = if (isSystemInDarkTheme()) {
-        ColorFilter.tint(Color.White) // Set color for dark theme
-    } else {
-        ColorFilter.tint(Color.Black) // Set color for light theme
-    }
-    Image(
-        painterResource(
-            id = R.drawable.round_trip_arrow
-        ),
-        contentDescription = "round_trip",
-        colorFilter = colorFilter,
-        modifier = Modifier
-            .size(30.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun CopyText() {
-    val colorFilter = if (isSystemInDarkTheme()) {
-        ColorFilter.tint(Color.White) // Set color for dark theme
-    } else {
-        ColorFilter.tint(Color.Black) // Set color for light theme
-    }
-    Image(
-        painterResource(
-            id = R.drawable.paste
-        ),
-        contentDescription = "copy",
-        colorFilter = colorFilter,
-        modifier = Modifier
-            .size(30.dp)
-            .clip(CircleShape)
-    )
-}
-
-@Composable
-fun Report() {
-    val colorFilter = if (isSystemInDarkTheme()) {
-        ColorFilter.tint(Color.White) // Set color for dark theme
-    } else {
-        ColorFilter.tint(Color.Black) // Set color for light theme
-    }
-    Image(
-        painterResource(id = R.drawable.report),
-        contentDescription = "report",
-        colorFilter = colorFilter,
-        modifier = Modifier
-            .size(30.dp)
-            .clip(CircleShape)
-    )
-}
-
-
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     EchoLinguaTheme {
-        InterfaceDisplayPage()
+        TranslateResultDisplayPage()
     }
 }
 
@@ -223,6 +242,6 @@ fun GreetingPreview() {
 @Composable
 fun DarkModeGreetingPreview() {
     EchoLinguaTheme {
-        InterfaceDisplayPage()
+        TranslateResultDisplayPage()
     }
 }
