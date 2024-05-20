@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import com.example.echolingua.App
 import com.google.mlkit.nl.translate.TranslateLanguage
+import com.tencent.mmkv.MMKV
 import java.util.Locale
 
 private const val TAG = "LanguageSelectStateHold"
@@ -21,6 +22,12 @@ object LanguageSelectStateHolder {
 
     val languageMap =
         TranslateLanguage.getAllLanguages().associateWith { Locale.forLanguageTag(it).displayName }
+
+    init {
+        val mmkv = MMKV.defaultMMKV()
+        mSourceLanguage.value = mmkv.decodeString("sourceLanguage", "").toString()
+        mTargetLanguage.value = mmkv.decodeString("targetLanguage", "").toString()
+    }
 
     /**
      * Sets the language for translation.

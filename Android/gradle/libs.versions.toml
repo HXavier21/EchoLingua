@@ -12,6 +12,7 @@ languageId = "17.0.5"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.9.0"
 composeBom = "2024.05.00"
+mmkv = "1.3.5"
 navigationCompose = "2.7.7"
 roomRuntime = "2.6.1"
 textRecognition = "16.0.0"
@@ -50,6 +51,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 
 language-id = { module = "com.google.mlkit:language-id", version.ref = "languageId" }
+mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 text-recognition = { module = "com.google.mlkit:text-recognition", version.ref = "textRecognition" }
 text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "textRecognitionChinese" }
 translate = { module = "com.google.mlkit:translate", version.ref = "translate" }

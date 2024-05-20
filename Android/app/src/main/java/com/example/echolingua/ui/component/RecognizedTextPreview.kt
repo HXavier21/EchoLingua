@@ -32,6 +32,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
+import com.example.echolingua.ui.page.LanguageSelectStateHolder
 import com.example.echolingua.util.Translator
 import com.google.mlkit.vision.text.Text
 import kotlinx.coroutines.Dispatchers
@@ -69,8 +70,12 @@ fun RecognizedTextPreview(
                 val realHeight = getLineHeight(line) * heightZoomRatio
                 var textToShow by remember { mutableStateOf(line.text) }
                 var translatedText by remember { mutableStateOf("") }
-                LaunchedEffect(key1 = line) {
+                LaunchedEffect(
+                    LanguageSelectStateHolder.sourceLanguage.value,
+                    LanguageSelectStateHolder.targetLanguage.value
+                ) {
                     withContext(Dispatchers.Default) {
+                        Log.d(TAG, "RecognizedTextPreview: translate text")
                         Translator.translateWithAutoDetect(line.text) { result ->
                             translatedText = result
                             if (!showOriginalText) {

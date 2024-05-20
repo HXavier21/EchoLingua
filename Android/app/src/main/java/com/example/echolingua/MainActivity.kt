@@ -31,6 +31,7 @@ import com.example.echolingua.ui.navigator.TranslatePagesNavigator
 import com.example.echolingua.ui.page.LanguageSelectPage
 import com.example.echolingua.ui.page.LanguageSelectStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
+import com.tencent.mmkv.MMKV
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -61,6 +62,13 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         pickMedia.unregister()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val mmkv = MMKV.defaultMMKV()
+        mmkv.encode("sourceLanguage", LanguageSelectStateHolder.sourceLanguage.value)
+        mmkv.encode("targetLanguage", LanguageSelectStateHolder.targetLanguage.value)
     }
 
     private fun <I, O> ComponentActivity.registerActivityResultLauncher(
