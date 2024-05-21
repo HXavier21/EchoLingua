@@ -1,5 +1,6 @@
 package com.example.echolingua.ui.page
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -43,12 +44,12 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 defaultElevation = 10.dp
             ),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.onSurface,
+                containerColor = MaterialTheme.colorScheme.surface,
             ),
             modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.onSurface)
                 .padding(10.dp)
                 .clip(RoundedCornerShape(20.dp))
-                .background(color = MaterialTheme.colorScheme.onSurface)
                 .fillMaxWidth()
         ) {
             Row(
@@ -59,7 +60,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 Icon(
                     painter = painterResource(id = R.drawable.translate),
                     contentDescription = null,
-                    tint = Color.White,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .size(25.dp)
@@ -68,13 +69,13 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 Text(
                     text = "EchoLingua翻译",
                     textAlign = TextAlign.Center,
-                    color = Color.White,
+                    color =  MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = null,
-                    tint = Color.White,
+                    tint =  MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .padding(start = 20.dp, end = 20.dp)
                         .size(20.dp)
@@ -84,7 +85,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 Row {
                     Text(
                         text = "中文(简体)   - 检测到的语言",
-                        color = Color.White,
+                        color =  MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(top = 20.dp, start = 20.dp)
                     )
@@ -92,7 +93,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     Icon(
                         painter = painterResource(id = R.drawable.paste),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint =  MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(end = 20.dp, top = 20.dp)
                             .size(25.dp)
@@ -100,7 +101,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     Icon(
                         painter = painterResource(id = R.drawable.report),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint =  MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(end = 20.dp, top = 20.dp)
                             .size(25.dp)
@@ -108,7 +109,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 }
                 Text(
                     text = "身体",
-                    color = Color.White,
+                    color =  MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .padding(top = 10.dp, start = 20.dp)
                 )
@@ -119,7 +120,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 Row {
                     Text(
                         text = "英语",
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = MaterialTheme.colorScheme.surfaceTint,
                         modifier = Modifier
                             .padding(top = 20.dp, start = 20.dp)
                     )
@@ -127,7 +128,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     Icon(
                         painter = painterResource(id = R.drawable.paste),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        tint = MaterialTheme.colorScheme.surfaceTint,
                         modifier = Modifier
                             .padding(end = 20.dp, top = 20.dp)
                             .size(25.dp)
@@ -135,7 +136,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     Icon(
                         painter = painterResource(id = R.drawable.report),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primaryContainer,
+                        tint = MaterialTheme.colorScheme.surfaceTint,
                         modifier = Modifier
                             .padding(end = 20.dp, top = 20.dp)
                             .size(25.dp)
@@ -143,14 +144,14 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 }
                 Text(
                     text = "human body",
-                    color = MaterialTheme.colorScheme.primaryContainer,
+                    color = MaterialTheme.colorScheme.surfaceTint,
                     modifier = Modifier
                         .padding(top = 10.dp, start = 20.dp, bottom = 20.dp)
                 )
             }else{
                 Text(
                     text = "检测语言",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surfaceTint,
                     modifier = Modifier
                         .padding(top = 20.dp, start = 20.dp)
                 )
@@ -165,7 +166,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     label = {
                         Text(
                             "输入文字",
-                            color = Color.White,
+                            color =  MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 )
@@ -186,6 +187,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(color = MaterialTheme.colorScheme.onSurface)
             ) {
                 ElevatedButton(
                     onClick = {
@@ -205,14 +207,14 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     onClick = {
                         onNewTranslateClick()
                     },
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primaryContainer),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
                     modifier = Modifier
                         .padding(end = 10.dp)
                 )
                 {
                     Text(
                         "新翻译",
-                        color = Color.Black
+                        color =  MaterialTheme.colorScheme.surface
                     )
                 }
             }
@@ -224,12 +226,12 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
 
 @Composable
 fun StateChoose() {
-    var state by remember { mutableStateOf(0) }
+    var state by remember { mutableStateOf(1) }
     QuickTranslatePage(state = state, onClearClick = {state=0}, onNewTranslateClick = {state=0})
 }
 
 
-@Preview(showBackground = true)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_NO, name = "Light")
 @Composable
 fun SecondTitlePreview() {
     EchoLinguaTheme {
@@ -240,5 +242,15 @@ fun SecondTitlePreview() {
     }
 }
 
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark")
+@Composable
+fun DarkSecondTitlePreview() {
+    EchoLinguaTheme {
+        Column {
+            StateChoose()
+        }
+
+    }
+}
 
 
