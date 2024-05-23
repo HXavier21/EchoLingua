@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +40,7 @@ fun TranslatePage(
     onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {}
 ) {
     val translatedText by translatePageViewModel.translatedTextFlow.collectAsState()
+    val focusManager = LocalFocusManager.current
     var text by remember {
         mutableStateOf("")
     }
@@ -62,6 +64,7 @@ fun TranslatePage(
                         )
                     },
                     onClick = {
+                        focusManager.clearFocus()
                         onNavigateToLanguageSelectPage(SelectMode.SOURCE)
                     }
                 )
@@ -83,6 +86,7 @@ fun TranslatePage(
                         )
                     },
                     onClick = {
+                        focusManager.clearFocus()
                         onNavigateToLanguageSelectPage(SelectMode.TARGET)
                     }
                 )
