@@ -2,9 +2,7 @@ package com.example.echolingua.ui.page
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,41 +61,7 @@ fun TranslateResultDisplayPage(
             color = MaterialTheme.colorScheme.surface
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Row(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface)
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        modifier = Modifier
-                            .padding(start = 10.dp)
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    val colorFilter = if (isSystemInDarkTheme()) {
-                        ColorFilter.tint(Color.White) // Set color for dark theme
-                    } else {
-                        ColorFilter.tint(Color.Black) // Set color for light theme
-                    }
-                    Image(
-                        painter = painterResource(id = R.drawable.historyicon),
-                        contentDescription = "history Icon",
-                        colorFilter = colorFilter,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                    )
-                    Spacer(modifier = Modifier.weight(0.1f))
-                    KeyTranslationsIcon()
-                    Spacer(modifier = Modifier.weight(0.1f))
-                    Icon(
-                        Icons.Filled.MoreVert,
-                        contentDescription = "feedback",
-                    )
-                }
+                TranslateResultDisplayNavigationBar()
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -121,27 +85,19 @@ fun TranslateResultDisplayPage(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val colorFilter = if (isSystemInDarkTheme()) {
-                                ColorFilter.tint(Color.White) // Set color for dark theme
-                            } else {
-                                ColorFilter.tint(Color.Black) // Set color for light theme
-                            }
-                            Image(
-                                painterResource(id = R.drawable.report),
+
+                            Icon(
+                                painter =  painterResource(id = R.drawable.report),
                                 contentDescription = "report",
-                                colorFilter = colorFilter,
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
                             )
                             Spacer(modifier = Modifier.weight(1f))
 
-                            Image(
-                                painterResource(
-                                    id = R.drawable.paste
-                                ),
+                            Icon(
+                                painter =  painterResource(id = R.drawable.paste),
                                 contentDescription = "copy",
-                                colorFilter = colorFilter,
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
@@ -181,38 +137,28 @@ fun TranslateResultDisplayPage(
                                 .fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            val colorFilter = if (isSystemInDarkTheme()) {
-                                ColorFilter.tint(Color.White) // Set color for dark theme
-                            } else {
-                                ColorFilter.tint(Color.Black) // Set color for light theme
-                            }
-                            Image(
-                                painterResource(id = R.drawable.report),
+
+                            Icon(
+                                painter =  painterResource(id = R.drawable.report),
                                 contentDescription = "report",
-                                colorFilter = colorFilter,
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
                             )
                             Spacer(modifier = Modifier.weight(1f))
 
-                            Image(
-                                painterResource(
-                                    id = R.drawable.paste
-                                ),
+                            Icon(
+                                painter =  painterResource(id = R.drawable.paste),
                                 contentDescription = "copy",
-                                colorFilter = colorFilter,
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
                             )
                             Spacer(modifier = Modifier.weight(0.2f))
-                            Image(
-                                painterResource(
-                                    id = R.drawable.round_trip_arrow
-                                ),
+
+                            Icon(
+                                painter =  painterResource(id = R.drawable.round_trip_arrow),
                                 contentDescription = "round_trip",
-                                colorFilter = colorFilter,
                                 modifier = Modifier
                                     .size(30.dp)
                                     .clip(CircleShape)
@@ -225,7 +171,44 @@ fun TranslateResultDisplayPage(
     }
 
 }
+@Composable
+fun TranslateResultDisplayNavigationBar(){
+    Row(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .fillMaxWidth()
+            .padding(10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = "Back",
+            modifier = Modifier
+                .padding(start = 10.dp)
+        )
+        Spacer(modifier = Modifier.weight(1f))
 
+        Icon(
+            painter = painterResource(id = R.drawable.historyicon),
+            contentDescription = "history Icon",
+            modifier = Modifier
+                .size(20.dp)
+                .clip(CircleShape)
+        )
+        Spacer(modifier = Modifier.weight(0.1f))
+        Icon(
+            Icons.Filled.Star,
+            contentDescription = null,
+            modifier = Modifier
+                .padding(start = 10.dp)
+        )
+        Spacer(modifier = Modifier.weight(0.1f))
+        Icon(
+            Icons.Filled.MoreVert,
+            contentDescription = "feedback",
+        )
+    }
+}
 
 @Preview(showBackground = true)
 @Composable

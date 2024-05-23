@@ -62,24 +62,17 @@ fun MainTranslateInputPage(
                         .padding(start = 10.dp)
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                val colorFilter = if (isSystemInDarkTheme()) {
-                    ColorFilter.tint(Color.White) // Set color for dark theme
-                } else {
-                    ColorFilter.tint(Color.Black) // Set color for light theme
-                }
-                Image(
-                    painter = painterResource(id = R.drawable.round_trip_arrow),
-                    contentDescription = "history Icon",
-                    colorFilter = colorFilter,
+                Icon(
+                    painter =  painterResource(id = R.drawable.round_trip_arrow),
+                    contentDescription = "round_trip",
                     modifier = Modifier
                         .size(20.dp)
                         .clip(CircleShape)
                 )
                 Spacer(modifier = Modifier.weight(0.1f))
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.historyicon),
                     contentDescription = "history Icon",
-                    colorFilter = colorFilter,
                     modifier = Modifier
                         .size(20.dp)
                         .clip(CircleShape)
@@ -99,7 +92,6 @@ fun MainTranslateInputPage(
     }
 
 }
-
 
 @Preview(showBackground = true)
 @Composable
