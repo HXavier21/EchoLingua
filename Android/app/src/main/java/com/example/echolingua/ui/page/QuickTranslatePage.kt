@@ -30,7 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.R
@@ -67,9 +72,22 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "EchoLingua翻译",
-                    textAlign = TextAlign.Center,
-                    color =  MaterialTheme.colorScheme.onSurface,
+                    text = buildAnnotatedString {
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.Bold
+                            )
+                        ){
+                            append("EchoLingua")
+                        }
+                        withStyle(
+                            style = SpanStyle(
+                            )
+                        ){
+                            append("翻译")
+                        }
+
+                    }
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
@@ -193,13 +211,14 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     onClick = {
                       onClearClick()
                     },
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSurfaceVariant),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceVariant),
                     modifier = Modifier
                         .padding(start = 10.dp)
                 )
                 {
                     Text(
-                        "清除"
+                        "清除",
+                                color =  MaterialTheme.colorScheme.onSurface
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -207,7 +226,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     onClick = {
                         onNewTranslateClick()
                     },
-                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.secondary),
+                    colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceTint),
                     modifier = Modifier
                         .padding(end = 10.dp)
                 )
