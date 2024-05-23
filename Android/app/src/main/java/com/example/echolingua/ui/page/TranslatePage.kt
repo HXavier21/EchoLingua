@@ -37,7 +37,8 @@ fun TranslatePage(
     translatePageViewModel: TranslatePageViewModel = viewModel(),
     onNavigateToCameraTranslatePage: () -> Unit = {},
     onNavigateToAudioTranscribePage: () -> Unit = {},
-    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {}
+    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {},
+    onNavigateToBackEndTestPage: () -> Unit = {}
 ) {
     val translatedText by translatePageViewModel.translatedTextFlow.collectAsState()
     val focusManager = LocalFocusManager.current
@@ -128,6 +129,14 @@ fun TranslatePage(
             ) {
                 Text(text = "Camera Translate")
             }
+        }
+        Button(
+            onClick = { onNavigateToBackEndTestPage() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Text(text = "To BackEndTestPage")
         }
     }
 }

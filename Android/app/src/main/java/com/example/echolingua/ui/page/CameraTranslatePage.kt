@@ -212,6 +212,7 @@ fun CameraTranslatePage(
                                     interactionSource = interactionSource,
                                     indication = null
                                 ) {
+                                    (context as MainActivity).stopCamera()
                                     onNavigateBackToTranslatePage()
                                 }
                                 .padding(10.dp),

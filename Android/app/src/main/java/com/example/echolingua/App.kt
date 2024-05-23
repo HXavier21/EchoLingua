@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.media.MediaRecorder
+import androidx.media3.exoplayer.ExoPlayer
 import com.example.echolingua.whisper.WhisperContext
 import com.tencent.mmkv.MMKV
 import java.io.File
@@ -22,6 +23,7 @@ class App : Application() {
         imagePath.mkdirs()
         mediaRecorder = MediaRecorder()
         val rootDir = MMKV.initialize(this)
+        player = ExoPlayer.Builder(context).build()
     }
 
     override fun onTerminate() {
@@ -37,6 +39,7 @@ class App : Application() {
         lateinit var imagePath: File
         lateinit var whisperContext: WhisperContext
         lateinit var mediaRecorder: MediaRecorder
+        lateinit var player: ExoPlayer
     }
 
 }
