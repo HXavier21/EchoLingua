@@ -23,9 +23,15 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.echolingua.ui.navigator.MyNavigator
+import com.example.echolingua.ui.page.QuickTranslatePage
+import com.example.echolingua.ui.page.StateChoose
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 import java.io.File
 import java.text.SimpleDateFormat
@@ -49,6 +55,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             EchoLinguaTheme {
                 MyNavigator()
+                StateChoose()
             }
         }
     }

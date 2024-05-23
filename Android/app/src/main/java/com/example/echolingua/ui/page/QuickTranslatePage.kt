@@ -1,7 +1,10 @@
 package com.example.echolingua.ui.page
 
+import android.content.Context
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
@@ -22,6 +27,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -29,11 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +52,7 @@ import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @Composable
 fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateClick:()->Unit={}) {
+
     Column {
         ElevatedCard(
             elevation = CardDefaults.cardElevation(
@@ -100,22 +110,31 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 )
             }
             if (state == 1) {
+                val clipboardManger= LocalClipboardManager.current
+                val onCloneClick: ()->Unit={
+                      val textToCopy="Hello"
+                        clipboardManger.setText(AnnotatedString(textToCopy))
+                }
                 Row {
                     Text(
                         text = "中文(简体)   - 检测到的语言",
                         color =  MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
-                            .padding(top = 20.dp, start = 20.dp)
+                            .padding(top = 30.dp, start = 20.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f))
-                    Icon(
-                        painter = painterResource(id = R.drawable.paste),
-                        contentDescription = null,
-                        tint =  MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .padding(end = 20.dp, top = 20.dp)
-                            .size(25.dp)
-                    )
+                        Icon(
+                            painter = painterResource(id = R.drawable.paste),
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier
+                                .padding(end = 20.dp, top = 20.dp)
+                                .size(25.dp)
+                                .clickable {
+                                     onCloneClick()
+                                }
+                        )
+
                     Icon(
                         painter = painterResource(id = R.drawable.report),
                         contentDescription = null,
@@ -129,7 +148,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     text = "身体",
                     color =  MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
-                        .padding(top = 10.dp, start = 20.dp)
+                        .padding(top = 20.dp, start = 20.dp)
                 )
                 Divider(
                     color = Color.DarkGray,
@@ -140,7 +159,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                         text = "英语",
                         color = MaterialTheme.colorScheme.surfaceTint,
                         modifier = Modifier
-                            .padding(top = 20.dp, start = 20.dp)
+                            .padding(top = 30.dp, start = 20.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Icon(
@@ -150,6 +169,9 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                         modifier = Modifier
                             .padding(end = 20.dp, top = 20.dp)
                             .size(25.dp)
+                            .clickable {
+                                onCloneClick()
+                            }
                     )
                     Icon(
                         painter = painterResource(id = R.drawable.report),
@@ -164,7 +186,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                     text = "human body",
                     color = MaterialTheme.colorScheme.surfaceTint,
                     modifier = Modifier
-                        .padding(top = 10.dp, start = 20.dp, bottom = 20.dp)
+                        .padding(top = 20.dp, start = 20.dp, bottom = 20.dp)
                 )
             }else{
                 Text(
@@ -176,9 +198,16 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 var text by remember {
                     mutableStateOf("")
                 }
+                val clipboardManager= LocalClipboardManager.current
                 OutlinedTextField(
                     value = text,
                     onValueChange = { text = it },
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = {
+                        if( text.isNotEmpty()) {
+                           onNewTranslateClick()
+                       }
+                    }),
                     modifier = Modifier
                         .padding(start = 20.dp, top = 10.dp),
                     label = {
@@ -188,8 +217,14 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                         )
                     }
                 )
+
                 ElevatedButton(
-                    onClick = { },
+                    onClick = {
+                              val clipboardText=clipboardManager.getText()
+                        if(clipboardText!=null){
+                            text=clipboardText.text
+                        }
+                    },
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.onSurfaceVariant),
                     modifier = Modifier
                         .padding(start = 20.dp, top = 20.dp, bottom = 20.dp)
@@ -224,7 +259,7 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
                 Spacer(modifier = Modifier.weight(1f))
                 ElevatedButton(
                     onClick = {
-                        onNewTranslateClick()
+                        onClearClick()
                     },
                     colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surfaceTint),
                     modifier = Modifier
@@ -245,8 +280,8 @@ fun QuickTranslatePage(state: Number, onClearClick:()->Unit={},onNewTranslateCli
 
 @Composable
 fun StateChoose() {
-    var state by remember { mutableStateOf(1) }
-    QuickTranslatePage(state = state, onClearClick = {state=0}, onNewTranslateClick = {state=0})
+    var state by remember { mutableIntStateOf(1) }
+    QuickTranslatePage(state = state, onClearClick = {state=0}, onNewTranslateClick = {state=1})
 }
 
 
