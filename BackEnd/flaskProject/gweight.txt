@@ -1,0 +1,1 @@
+D:\code\SoftwareEngineering\TTS\models\Asta\Asta-e10.ckpt

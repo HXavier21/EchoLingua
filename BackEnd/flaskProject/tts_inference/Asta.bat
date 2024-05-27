@@ -1,3 +1,0 @@
-cd D:\code\SoftwareEngineering\TTS\GPT-SoVITS-beta0217\GPT-SoVITS-beta0217fix
-.\runtime\python.exe api2.py -s "D:\code\SoftwareEngineering\TTS\models\Asta\Asta_e25_s925.pth" -g "D:\code\SoftwareEngineering\TTS\models\Asta\Asta-e10.ckpt" -dr "D:\code\SoftwareEngineering\TTS\models\Asta\reference_voice\平静说话-你们经过的收容舱段收藏着诸多「奇物」和「遗器」，是最核心的研究场所。.wav" -dt "你们经过的收容舱段收藏着诸多「奇物」和「遗器」，是最核心的研究场所。" -dl "zh" -p 9880
-pause

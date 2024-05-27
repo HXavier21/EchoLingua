@@ -1,0 +1,58 @@
+{
+    "Asta":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Asta\\Asta-e10.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Asta\\Asta_e25_s925.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Asta\\平静说话-你们经过的收容舱段收藏着诸多「奇物」和「遗器」，是最核心的研究场所。.wav",
+            "prompt_text": " 你们经过的收容舱段收藏着诸多「奇物」和「遗器」，是最核心的研究场所。",
+            "prompt_language": "zh"
+        },
+    "Keqing":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Keqing\\Keqing-e10.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Keqing\\Keqing_e15_s780.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Keqing\\这「七圣召唤」虽说是游戏，但对局之中也隐隐有策算谋略之理。.wav",
+            "prompt_text": "这「七圣召唤」虽说是游戏，但对局之中也隐隐有策算谋略之理。",
+            "prompt_language": "zh"
+        },
+    "March7th":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\March7th\\March7th-e10.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\March7th\\March7th_e15_s4875.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\March7th\\说话-名字是我自己取的，大家也叫我三月、小三月…你呢？你想叫我什么？.wav",
+            "prompt_text": "名字是我自己取的，大家也叫我三月、小三月…你呢？你想叫我什么？",
+            "prompt_language": "zh"
+        },
+    "Palm":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Palm\\Palm-e10.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Palm\\Palm_e15_s495.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Palm\\说话-我是这儿的列车长帕姆，在车上遇到任何问题你都尽管来找我吧。.wav",
+            "prompt_text": "我是这儿的列车长帕姆，在车上遇到任何问题你都尽管来找我吧。",
+            "prompt_language": "zh"
+        },
+    "Wanderer":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Wanderer\\Wanderer-e10.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Wanderer\\Wanderer_e15_s690.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Wanderer\\就像你在反抗军的朋友一样，无论怎么努力，都不过是徒劳。.wav",
+            "prompt_text": "就像你在反抗军的朋友一样，无论怎么努力，都不过是徒劳。",
+            "prompt_language": "zh"
+        },
+    "Yuuka":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\yuuka\\yuuka-e15.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\yuuka\\yuuka_e8_s128.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\yuuka\\语气1.wav",
+            "prompt_text": "運が良かった？いいえ、計算通りです。",
+            "prompt_language": "ja"
+        },
+    "Zhongli":
+        {
+            "gpt_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Zhongli\\Zhongli-e10.ckpt",
+            "sovits_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Zhongli\\Zhongli_e15_s1395.pth",
+            "refer_wav_path": "D:\\code\\SoftwareEngineering\\TTS\\models\\Zhongli\\无事逢客休，席上校两棋…我们开局吧。.wav",
+            "prompt_text": "无事逢客休，席上校两棋…我们开局吧。",
+            "prompt_language": "zh"
+        }
+}

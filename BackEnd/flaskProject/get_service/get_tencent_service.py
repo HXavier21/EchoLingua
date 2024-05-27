@@ -124,8 +124,7 @@ def get_tencent_service(data, email):
         # 将历史记录添加到用户对应的历史记录表中
         db.session.add(history_entry)
         db.session.commit()
-
-        # 返回翻译后的目标文本
         return response_data
+
     except Exception as err:
         return str(err)
