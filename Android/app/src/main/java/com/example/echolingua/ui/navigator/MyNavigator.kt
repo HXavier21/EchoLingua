@@ -1,7 +1,6 @@
 package com.example.echolingua.ui.navigator
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,14 +13,16 @@ import com.example.echolingua.ui.navigator.RouteName.withArgument
 import com.example.echolingua.ui.navigator.RouteName.withArgumentKey
 import com.example.echolingua.ui.page.AudioTranscribePage
 import com.example.echolingua.ui.page.CameraTranslatePage
+import com.example.echolingua.ui.page.DataPage
 import com.example.echolingua.ui.page.LanguageSelectPage
+import com.example.echolingua.ui.page.MainTranslatePage
 import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.page.TranslatePage
 
 @Composable
 fun MyNavigator(
     navController: NavHostController = rememberNavController(),
-    startDestination: String = RouteName.TRANSLATE_PAGE
+    startDestination: String = RouteName.MAIN_TRANSLATE_PAGE
 ) {
     NavHost(
         navController = navController, startDestination = startDestination
@@ -65,5 +66,16 @@ fun MyNavigator(
             })
         }
 
+        composable(RouteName.MAIN_TRANSLATE_PAGE) {
+            MainTranslatePage(onNavigateToDataPage = {
+                navController.navigate(RouteName.DATA_PAGE)
+            })
+        }
+
+        composable(RouteName.DATA_PAGE) {
+            DataPage(onNavigateBackToMainTranslatePage={
+                navController.popBackStack()
+            })
+        }
     }
 }

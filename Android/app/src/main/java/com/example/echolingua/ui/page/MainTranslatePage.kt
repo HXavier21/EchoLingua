@@ -2,6 +2,7 @@ package com.example.echolingua.ui.page
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,8 +21,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerBasedShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -33,14 +35,16 @@ import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.twotone.Mic
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeFloatingActionButton
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,44 +58,54 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.echolingua.R
 import com.example.echolingua.ui.component.TextInput
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
+private const val TAG = "MainTranslatePage"
 
 // 定义页面状态枚举
 enum class PageState {
     MAIN_PAGE,
-    TRANSLATE_PAGE,
-    RESULT_PAGE
+    INPUT_PAGE,
+    DISPLAY_PAGE
 }
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun MainTranslatePage(modifier: Modifier = Modifier) {
-    var showPage by remember { mutableStateOf(PageState.MAIN_PAGE) }
+fun MainTranslatePage(
+    onNavigateToDataPage: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    currentPage: PageState = PageState.MAIN_PAGE
+) {
+    var showPage by remember { mutableStateOf(currentPage) }
 
     fun onNewTranslationClicked() {
-        showPage = PageState.TRANSLATE_PAGE
+        showPage = PageState.INPUT_PAGE
     }
 
     Surface(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.inverseOnSurface
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (showPage) {
-                PageState.MAIN_PAGE  -> {
-                    MainPageNavigationBar()
+                PageState.MAIN_PAGE -> {
+                    MainPageNavigationBar(onNavigateToDataPage = onNavigateToDataPage)
                     Box(
-                        modifier = modifier
-
-                            .weight(1f)
+                        modifier = modifier.weight(1f)
                     ) {
                         Spacer(
                             modifier = Modifier
@@ -100,7 +114,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                 .background(MaterialTheme.colorScheme.surface)
                         )
                         Column(
-                            modifier= Modifier
+                            modifier = Modifier
                                 .clip(shape = MaterialTheme.shapes.extraLarge)
                                 .fillMaxSize()
                                 .background(MaterialTheme.colorScheme.surface)
@@ -108,34 +122,39 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                     interactionSource = remember { MutableInteractionSource() }, // 设置interactionSource
                                     indication = null, // 设置为 null 禁用涟漪效果
                                     onClick = {
-                                        showPage = PageState.TRANSLATE_PAGE
+                                        showPage = PageState.INPUT_PAGE
                                     }
                                 )
-                        ){
+                        ) {
                             Spacer(modifier = Modifier.size(24.dp))
                             Text(
-                                text = "输入文字",
+                                text = "   输入文字",
+                                fontSize = 33.sp,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.size(10.dp))
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(10.dp)
+                    ) {
                         SwitchLanguage()
-                        Spacer(modifier = Modifier.size(24.dp))
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(vertical = 24.dp)
+                                .padding(top = 10.dp)
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.padding(start = 40.dp)
                             ) {
-                                LargeFloatingActionButton(
+                                IconButton(
                                     onClick = { /*TODO*/ },
-                                    shape = CircleShape,
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     modifier = Modifier
-                                        .size(50.dp)
+                                        .size(40.dp)
+                                        .clip(shape = CircleShape)
+                                        .background(color = MaterialTheme.colorScheme.secondaryContainer)
                                 ) {
                                     Icon(
                                         Icons.Outlined.Group,
@@ -146,24 +165,25 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                 }
                                 Text(
                                     text = "对话",
-                                    fontSize = 10.sp,
-                                    modifier = Modifier
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
                                 )
                             }
 
                             Spacer(modifier = Modifier.weight(1f))
-                            LargeFloatingActionButton(
+                            IconButton(
                                 onClick = { /*TODO*/ },
-                                shape = CircleShape,
-                                containerColor = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier
-                                    .size(100.dp)
-                                    .offset(y = (-10).dp),
+                                    .size(90.dp)
+                                    .offset(y = (-10).dp)
+                                    .clip(shape = CircleShape)
+                                    .background(color = MaterialTheme.colorScheme.primary)
                             ) {
                                 Icon(
                                     Icons.TwoTone.Mic,
                                     "MicPhone",
-                                    modifier = Modifier.size(35.dp)
+                                    modifier = Modifier.size(35.dp),
+                                    tint = MaterialTheme.colorScheme.surface
                                 )
                             }
                             Spacer(modifier = Modifier.weight(1f))
@@ -171,12 +191,12 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier.padding(end = 40.dp)
                             ) {
-                                LargeFloatingActionButton(
+                                IconButton(
                                     onClick = { /*TODO*/ },
-                                    shape = CircleShape,
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                     modifier = Modifier
-                                        .size(50.dp)
+                                        .size(40.dp)
+                                        .clip(shape = CircleShape)
+                                        .background(color = MaterialTheme.colorScheme.secondaryContainer)
                                 ) {
                                     Icon(
                                         Icons.Outlined.CameraAlt,
@@ -187,13 +207,15 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                 }
                                 Text(
                                     text = "相机",
-                                    fontSize = 10.sp
+                                    fontSize = 12.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
                                 )
                             }
                         }
                     }
                 }
-                PageState.TRANSLATE_PAGE-> {
+
+                PageState.INPUT_PAGE -> {
                     val focusRequester = remember { FocusRequester() }
 
                     // 添加 BackHandler 监听系统返回按钮事件
@@ -202,7 +224,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                         showPage = PageState.MAIN_PAGE
                     }
                     TranslateInputNavigationBar {
-                        showPage =  PageState.MAIN_PAGE
+                        showPage = PageState.MAIN_PAGE
                     }
                     Box(
                         modifier = modifier
@@ -215,7 +237,6 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
-                                    .statusBarsPadding()
                                     .navigationBarsPadding()
                                     .imePadding()
                             ) {
@@ -224,16 +245,18 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                         .weight(1f)
                                         .focusRequester(focusRequester),
                                     onEnterPressed = {
-                                        showPage=  PageState.RESULT_PAGE
+                                        showPage = PageState.DISPLAY_PAGE
                                     }
                                 )
-                                Spacer(modifier = Modifier.size(10.dp))
-                                SwitchLanguage()
+                                Spacer(modifier = Modifier.height(10.dp))
+                                SwitchLanguage(150.dp, 38.dp, RoundedCornerShape(16.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
                             }
                         }
                     }
                 }
-                PageState.RESULT_PAGE -> {
+
+                PageState.DISPLAY_PAGE -> {
                     // 添加 BackHandler 监听系统返回按钮事件
                     BackHandler {
                         // 返回主界面
@@ -261,7 +284,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 TranslateResultDisplayNavigationBar {
-                                    showPage =  PageState.MAIN_PAGE
+                                    showPage = PageState.MAIN_PAGE
                                 }
                                 Row(
                                     modifier = Modifier
@@ -288,7 +311,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                         ) {
 
                                             Icon(
-                                                painter =  painterResource(id = R.drawable.report),
+                                                painter = painterResource(id = R.drawable.report),
                                                 contentDescription = "report",
                                                 modifier = Modifier
                                                     .size(30.dp)
@@ -297,7 +320,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                             Spacer(modifier = Modifier.weight(1f))
 
                                             Icon(
-                                                painter =  painterResource(id = R.drawable.paste),
+                                                painter = painterResource(id = R.drawable.paste),
                                                 contentDescription = "copy",
                                                 modifier = Modifier
                                                     .size(30.dp)
@@ -340,7 +363,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                         ) {
 
                                             Icon(
-                                                painter =  painterResource(id = R.drawable.report),
+                                                painter = painterResource(id = R.drawable.report),
                                                 contentDescription = "report",
                                                 modifier = Modifier
                                                     .size(30.dp)
@@ -349,7 +372,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                             Spacer(modifier = Modifier.weight(1f))
 
                                             Icon(
-                                                painter =  painterResource(id = R.drawable.paste),
+                                                painter = painterResource(id = R.drawable.paste),
                                                 contentDescription = "copy",
                                                 modifier = Modifier
                                                     .size(30.dp)
@@ -358,7 +381,7 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
                                             Spacer(modifier = Modifier.weight(0.2f))
 
                                             Icon(
-                                                painter =  painterResource(id = R.drawable.round_trip_arrow),
+                                                painter = painterResource(id = R.drawable.round_trip_arrow),
                                                 contentDescription = "round_trip",
                                                 modifier = Modifier
                                                     .size(30.dp)
@@ -377,25 +400,26 @@ fun MainTranslatePage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun SwitchLanguage() {
+fun SwitchLanguage(
+    buttonWidth: Dp = 150.dp,
+    buttonHeight: Dp = 54.dp,
+    shape: CornerBasedShape = RoundedCornerShape(16.dp)
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 20.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = { /*TODO*/ },
-            shape = MaterialTheme.shapes.small,
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface)
+            shape = shape,
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface),
+            modifier = Modifier
+                .size(width = buttonWidth, height = buttonHeight)
         ) {
             Text(
-                text = "中文",
+                text = "中文（简体）",
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .padding(horizontal = 25.dp)
+                textAlign = TextAlign.Center
             )
         }
         Icon(
@@ -409,54 +433,55 @@ fun SwitchLanguage() {
         )
         Button(
             onClick = { /*TODO*/ },
-            shape = MaterialTheme.shapes.small,
-            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface)
+            shape = shape,
+            colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.surface),
+            modifier = Modifier
+                .size(width = buttonWidth, height = buttonHeight)
         ) {
             Text(
                 text = "英文",
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .padding(horizontal = 25.dp)
+                textAlign = TextAlign.Center
             )
         }
     }
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TranslateInputNavigationBar(onIconClick: () -> Unit){
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        CustomIcon(onIconClick)
-        Spacer(modifier = Modifier.weight(1f))
-        Icon(
-            painter =  painterResource(id = R.drawable.round_trip_arrow),
-            contentDescription = "round_trip",
-            modifier = Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.weight(0.1f))
-        Icon(
-            painter = painterResource(id = R.drawable.historyicon),
-            contentDescription = "history Icon",
-            modifier = Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.weight(0.1f))
-        Icon(
-            Icons.Filled.MoreVert,
-            contentDescription = "feedback",
-        )
-    }
+fun TranslateInputNavigationBar(onIconClick: () -> Unit) {
+    TopAppBar(
+        title = {},
+        navigationIcon = {
+            CustomIcon(onIconClick)
+
+
+        }, actions = {
+            Icon(
+                painter = painterResource(id = R.drawable.round_trip_arrow),
+                contentDescription = "round_trip",
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .size(20.dp)
+                    .clip(CircleShape)
+            )
+            Icon(
+                painter = painterResource(id = R.drawable.historyicon),
+                contentDescription = "history Icon",
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .size(20.dp)
+                    .clip(CircleShape)
+            )
+            Icon(
+                Icons.Filled.MoreVert,
+                contentDescription = "feedback",
+            )
+        }
+    )
 }
+
 @Composable
 fun CustomIcon(onIconClick: () -> Unit) {
     Icon(
@@ -464,87 +489,119 @@ fun CustomIcon(onIconClick: () -> Unit) {
         contentDescription = "Back",
         modifier = Modifier
             .padding(start = 10.dp)
-            .clickable (
+            .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // 将涟漪效果设置为 null
-            ){
+            ) {
                 onIconClick()
             }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainPageNavigationBar() {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            Icons.Filled.Star,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(start = 10.dp)
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Text(
-            text = "EchoLingua翻译",
-            modifier = Modifier
-        )
-        Spacer(modifier = Modifier.weight(1f))
-        Image(
-            painter = painterResource(R.drawable.aniya),
-            contentDescription = null,
-            modifier = Modifier
-                .padding(end = 10.dp)
-                .size(30.dp)
-                .clip(CircleShape)
-        )
-    }
+fun MainPageNavigationBar(onNavigateToDataPage: () -> Unit) {
+    TopAppBar(
+        title = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(fontStyle = FontStyle.Italic,fontWeight = FontWeight.SemiBold)) {
+                            append("EchoLingua ")
+                        }
+                        withStyle(style = SpanStyle(fontSize = 20.sp)){
+                            append("翻译")
+                        }
+                    },
+                    style = MaterialTheme.typography.headlineSmall
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = {
+                onNavigateToDataPage()
+                Log.d(TAG, "MainPageNavigationBar: 你好")
+            }) {
+                Icon(
+                    Icons.Filled.Star,
+                    contentDescription = null
+                )
+            }
+        },
+        actions = {
+            Image(
+                painter = painterResource(R.drawable.aniya),
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 10.dp)
+                    .size(30.dp)
+                    .clip(CircleShape)
+            )
+        }
+    )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TranslateResultDisplayNavigationBar(onIconClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .background(MaterialTheme.colorScheme.surface)
-            .fillMaxWidth()
-            .padding(10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        CustomIcon(onIconClick)
-        Spacer(modifier = Modifier.weight(1f))
+    TopAppBar(
+        title = { /*TODO*/ },
+        navigationIcon = {
+            CustomIcon(onIconClick)
+        },
+        actions = {
+            Icon(
+                painter = painterResource(id = R.drawable.historyicon),
+                contentDescription = "history Icon",
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .size(20.dp)
+                    .clip(CircleShape)
+            )
+            Icon(
+                Icons.Filled.Star,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(end = 20.dp)
+            )
+            Icon(
+                Icons.Filled.MoreVert,
+                contentDescription = "feedback",
+            )
+        }
 
-        Icon(
-            painter = painterResource(id = R.drawable.historyicon),
-            contentDescription = "history Icon",
-            modifier = Modifier
-                .size(20.dp)
-                .clip(CircleShape)
-        )
-        Spacer(modifier = Modifier.weight(0.1f))
-        Icon(
-            Icons.Filled.Star,
-            contentDescription = null,
-            modifier = Modifier
-                .padding(start = 10.dp)
-        )
-        Spacer(modifier = Modifier.weight(0.1f))
-        Icon(
-            Icons.Filled.MoreVert,
-            contentDescription = "feedback",
-        )
-    }
+    )
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun InterfaceMainPreview() {
+fun MainPagePreview() {
     EchoLinguaTheme {
         MainTranslatePage()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DisplayPagePreview() {
+    EchoLinguaTheme {
+        MainTranslatePage(
+            currentPage = PageState.DISPLAY_PAGE
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InputPagePreview() {
+    EchoLinguaTheme {
+        MainTranslatePage(
+            currentPage = PageState.INPUT_PAGE
+        )
     }
 }
 

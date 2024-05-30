@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 
 @Composable
@@ -63,6 +64,7 @@ fun TextInput(
             placeholder = {
                 Text(
                     "输入文字",
+                    fontSize = 33.sp,
                     color = MaterialTheme.colorScheme.inverseSurface,
                 )
             },
