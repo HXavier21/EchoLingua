@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             EchoLinguaTheme {
                 MyNavigator()
-                StateChoose()
             }
         }
     }
