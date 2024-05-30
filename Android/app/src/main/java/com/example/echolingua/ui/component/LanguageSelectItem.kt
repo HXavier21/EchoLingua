@@ -13,7 +13,6 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,17 +21,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.echolingua.ui.page.TranslateModelStatus
+import com.example.echolingua.ui.page.TranslateModelState
 
 @Composable
 fun LanguageSelectItem(
     key: String,
     name: String,
     selectedLanguage: String,
-    translateModelStatus: TranslateModelStatus,
+    translateModelState: TranslateModelState,
     modifier: Modifier = Modifier,
     onItemClick: () -> Unit = {},
-    onDownloadClick: () -> Unit = {}
+    onModelStateClick: (String) -> Unit = {}
 ) {
     Row(
         modifier = modifier
@@ -68,18 +67,21 @@ fun LanguageSelectItem(
             )
         )
         Spacer(modifier = Modifier.weight(1f))
-        when (translateModelStatus) {
-            TranslateModelStatus.DOWNLOADED -> {
+        when (translateModelState) {
+            TranslateModelState.DOWNLOADED -> {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     modifier = Modifier
                         .padding(10.dp)
                         .padding(end = 10.dp)
+                        .clickable {
+                           onModelStateClick(key)
+                        }
                 )
             }
 
-            TranslateModelStatus.NOT_DOWNLOADED -> {
+            TranslateModelState.NOT_DOWNLOADED -> {
                 Icon(
                     imageVector = Icons.Outlined.FileDownload,
                     contentDescription = null,
@@ -88,12 +90,12 @@ fun LanguageSelectItem(
                         .padding(10.dp)
                         .padding(end = 10.dp)
                         .clickable {
-                            onDownloadClick()
+                            onModelStateClick(key)
                         }
                 )
             }
 
-            TranslateModelStatus.DOWNLOADING -> {
+            TranslateModelState.DOWNLOADING -> {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .padding(10.dp)

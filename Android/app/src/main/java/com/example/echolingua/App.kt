@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.media.MediaRecorder
 import com.example.echolingua.whisper.WhisperContext
+import com.tencent.mmkv.MMKV
 import java.io.File
 
 class App : Application() {
@@ -20,6 +21,7 @@ class App : Application() {
         audioPath.mkdirs()
         imagePath.mkdirs()
         mediaRecorder = MediaRecorder()
+        val rootDir = MMKV.initialize(this)
     }
 
     override fun onTerminate() {
