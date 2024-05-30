@@ -13,11 +13,14 @@ import com.example.echolingua.ui.navigator.TranslatePagesNavigator
 
 @Composable
 fun PagesAccessToLanguageSelectPage(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateToBackEndTestPage: () -> Unit
 ) {
     val isSelecting by LanguageSelectStateHolder.isSelecting
     Box(modifier = modifier.fillMaxSize()) {
-        TranslatePagesNavigator()
+        TranslatePagesNavigator(
+            onNavigateToBackEndTestPage = onNavigateToBackEndTestPage
+        )
         AnimatedVisibility(
             visible = isSelecting,
             enter = fadeIn() + scaleIn(

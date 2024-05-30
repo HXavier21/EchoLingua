@@ -6,10 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,16 +21,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.FlashOff
-import androidx.compose.material.icons.filled.FlashOn
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,22 +39,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.echolingua.MainActivity
 import com.example.echolingua.R
+import com.example.echolingua.ui.component.CameraTranslateTopBar
 import com.example.echolingua.ui.component.FloatingLanguageSelectBlock
 import com.example.echolingua.ui.component.PhotoPreview
 import com.example.echolingua.util.TextRecognizer
@@ -89,7 +76,6 @@ fun CameraTranslatePage(
     var isCaptured by remember { mutableStateOf(false) }
     var width by remember { mutableIntStateOf(0) }
     var height by remember { mutableIntStateOf(0) }
-    var isTorchOn by remember { mutableStateOf(false) }
     val coroutine = rememberCoroutineScope()
     val cameraPermissionState =
         rememberPermissionState(permission = Manifest.permission.CAMERA, onPermissionResult = {
@@ -114,8 +100,7 @@ fun CameraTranslatePage(
                         }
                     }
                     withContext(Dispatchers.Default) {
-                        TextRecognizer.processImage(
-                            imageFile = uri,
+                        TextRecognizer.processImage(imageFile = uri,
                             language = TranslateLanguage.CHINESE,
                             refreshRecognizedText = {
                                 cameraTranslatePageViewModel.setRecognizedText(
@@ -169,7 +154,8 @@ fun CameraTranslatePage(
             )
             if (isCaptured) {
                 PhotoPreview(
-                    imageFile = imageFile, recognizeText = recognizedText,
+                    imageFile = imageFile,
+                    recognizeText = recognizedText,
                     showOriginalText = showOriginalText
                 )
             }
@@ -177,99 +163,24 @@ fun CameraTranslatePage(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(95.dp)
-                    ) {
-                        val brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.8f),
-                                Color.Black.copy(alpha = 0.5f),
-                                Color.Transparent
-                            )
+                CameraTranslateTopBar(
+                    isCaptured = isCaptured,
+                    onBackClick = {
+                        (context as MainActivity).stopCamera()
+                        onNavigateBackToTranslatePage()
+                    },
+                    onTorchClick = {
+                        (context as MainActivity).switchTorchState(it)
+                    },
+                    onCloseClick = {
+                        isCaptured = false
+                        cameraTranslatePageViewModel.setRecognizedText(
+                            com.google.mlkit.vision.text.Text("", listOf<String>())
                         )
-                        drawRect(
-                            brush = brush,
-                            size = this.size
-                        )
+                        cameraPermissionState.launchPermissionRequest()
                     }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        val interactionSource = remember { MutableInteractionSource() }
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            modifier = Modifier
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null
-                                ) {
-                                    onNavigateBackToTranslatePage()
-                                }
-                                .padding(10.dp),
-                            tint = Color.White
-                        )
-                        Icon(
-                            imageVector = if (isTorchOn) Icons.Default.FlashOn else Icons.Default.FlashOff,
-                            contentDescription = "Torch",
-                            modifier = Modifier
-                                .clickable(
-                                    interactionSource = interactionSource,
-                                    indication = null
-                                ) {
-                                    (context as MainActivity).switchTorchState(!isTorchOn)
-                                    isTorchOn = !isTorchOn
-                                }
-                                .padding(10.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More",
-                            modifier = Modifier.padding(10.dp),
-                            tint = Color.White
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.White, fontWeight = FontWeight.Black
-                                    )
-                                ) {
-                                    append("Echo")
-                                }
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.White
-                                    )
-                                ) {
-                                    append("Lingua")
-                                }
-                            },
-                            modifier = Modifier.padding(10.dp),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontStyle = FontStyle.Italic
-                        )
-                    }
-                }
-                FloatingLanguageSelectBlock(
-                    showOriginalText = showOriginalText,
+                )
+                FloatingLanguageSelectBlock(showOriginalText = showOriginalText,
                     onSwitchClick = {
                         cameraTranslatePageViewModel.setShowOriginText(!showOriginalText)
                     },
@@ -283,8 +194,7 @@ fun CameraTranslatePage(
                     },
                     onSwapIconClick = {
                         LanguageSelectStateHolder.swapLanguage()
-                    }
-                )
+                    })
                 Spacer(modifier = Modifier.weight(1f))
                 when (isCaptured) {
                     false -> {

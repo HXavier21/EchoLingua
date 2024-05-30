@@ -17,29 +17,32 @@ object Translator {
     fun translateWithAutoDetect(
         text: String,
         onSuccessCallback: (String) -> Unit = {},
+        sourceLanguage: String = LanguageSelectStateHolder.sourceLanguage.value,
+        targetLanguage: String = LanguageSelectStateHolder.targetLanguage.value
     ) {
         if (LanguageSelectStateHolder.sourceLanguage.value == "detect") {
             LanguageIdentification.getClient().identifyLanguage(text)
                 .addOnSuccessListener { languageCode ->
-                    translate(text, onSuccessCallback, languageCode)
+                    translate(text, onSuccessCallback, languageCode, targetLanguage)
                 }
                 .addOnFailureListener { exception ->
                     Log.e(TAG, "Identify Language: ", exception)
                 }
         } else {
-            translate(text, onSuccessCallback)
+            translate(text, onSuccessCallback, sourceLanguage, targetLanguage)
         }
     }
 
     private fun translate(
         text: String,
-        onSuccessCallback: (String) -> Unit = {},
-        languageCode: String = LanguageSelectStateHolder.sourceLanguage.value
+        onSuccessCallback: (String) -> Unit,
+        sourceLanguage: String,
+        targetLanguage: String
     ) {
-        Log.d(TAG, "translate: $languageCode")
+        Log.d(TAG, "translate: $sourceLanguage")
         val options = TranslatorOptions.Builder()
-            .setSourceLanguage(languageCode)
-            .setTargetLanguage(LanguageSelectStateHolder.targetLanguage.value)
+            .setSourceLanguage(sourceLanguage)
+            .setTargetLanguage(targetLanguage)
             .build()
         val translator = Translation.getClient(options)
         val conditions = DownloadConditions.Builder()
