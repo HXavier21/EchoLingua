@@ -1,1 +1,1 @@
-D:\code\SoftwareEngineering\TTS\models\Wanderer\Wanderer_e15_s690.pth
+D:\code\SoftwareEngineering\TTS\models\Keqing\Keqing_e15_s780.pth

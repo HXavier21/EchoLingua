@@ -1,1 +1,0 @@
-D:\code\SoftwareEngineering\TTS\models\Asta\Asta_e25_s925.pth

@@ -5,6 +5,9 @@ import re
 import sys
 import torch
 
+sys.path.append('..')
+from settings import bert_path, base_path
+
 if torch.cuda.is_available():
     device = "cuda"
 elif torch.backends.mps.is_available():
@@ -49,8 +52,7 @@ splits = {"，", "。", "？", "！", ",", ".", "?", "!", "~", ":", "：", "—"
 root_dir = os.getcwd()
 SoVITS_weight_root = "SoVITS_weights"
 GPT_weight_root = "GPT_weights"
-os.makedirs(SoVITS_weight_root, exist_ok=True)
-os.makedirs(GPT_weight_root, exist_ok=True)
+
 
 host = args.bind_addr
 port = args.port
@@ -59,7 +61,7 @@ sys.path.append(root_dir)
 sys.path.append(os.path.join(root_dir, "GPT_SoVITS"))
 gpt_path = args.gpt_path
 sovits_path = args.sovits_path
-bert_path = 'D:\\code\\SoftwareEngineering\\TTS\\models\\bert\\chinese-roberta-wwm-ext-large'
+bert_path = bert_path
 
 os.environ['PYTORCH_ENABLE_MPS_FALLBACK'] = '1'  # 确保直接启动推理UI时也能够设置。
 
@@ -84,7 +86,7 @@ from time import time as ttime
 from GPT_SoVITS.module.mel_processing import spectrogram_torch
 from GPT_SoVITS.my_utils import load_audio
 
-cnhubert.cnhubert_base_path = 'D:\\code\\SoftwareEngineering\\TTS\\models\\bert\\chinese-hubert-base'
+cnhubert.cnhubert_base_path = base_path
 
 logging.getLogger("markdown_it").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)

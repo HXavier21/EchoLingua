@@ -1,1 +1,1 @@
-D:\code\SoftwareEngineering\TTS\models\Wanderer\Wanderer-e10.ckpt
+D:\code\SoftwareEngineering\TTS\models\Keqing\Keqing-e10.ckpt
