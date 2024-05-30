@@ -31,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import com.example.echolingua.ui.page.QuickTranslatePage
+import com.example.echolingua.ui.page.StateChoose
 import com.example.echolingua.ui.page.TranslatePageViewModel
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
@@ -41,10 +42,13 @@ class QuickTranslateActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EchoLinguaTheme {
-                var state by remember { mutableStateOf(1) }
-                QuickTranslatePage(state = state, onClearClick = {state=0}, onNewTranslateClick = {state=0})
+                StateChoose()
             }
         }
 
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }
