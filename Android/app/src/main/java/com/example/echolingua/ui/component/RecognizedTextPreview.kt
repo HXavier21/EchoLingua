@@ -76,39 +76,35 @@ fun RecognizedTextPreview(
                 ) {
                     withContext(Dispatchers.Default) {
                         Log.d(TAG, "RecognizedTextPreview: translate text")
-                        Translator.translateWithAutoDetect(line.text) { result ->
-                            translatedText = result
-                            if (!showOriginalText) {
-                                textToShow = result
-                            }
-                        }
+                        Translator.translateWithAutoDetect(
+                            line.text,
+                            onSuccessCallback = { result ->
+                                translatedText = result
+                                if (!showOriginalText) {
+                                    textToShow = result
+                                }
+                            })
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .graphicsLayer {
-                            translationX =
-                                spaceX + (line.cornerPoints?.get(0)?.x
-                                    ?: 0) * widthZoomRatio
-                            translationY =
-                                spaceY + (line.cornerPoints?.get(0)?.y
-                                    ?: 0) * heightZoomRatio
-                            transformOrigin = TransformOrigin(0f, 0f)
-                            rotationZ = getRotationZ(line).toFloat()
-                        }
-                        .offset(
-                            x = -boxHorizontalPadding.pixelToDp(),
-                            y = -boxVerticalPadding.pixelToDp()
-                        )
-                        .size(
-                            (realWidth.coerceAtLeast(0f) + boxHorizontalPadding * 2).pixelToDp(),
-                            (realHeight.coerceAtLeast(0f) + boxVerticalPadding * 2).pixelToDp()
-                        )
-                        .background(
-                            color = Color.White.copy(alpha = if (showOriginalText) 0.2f else 0.9f),
-                            shape = MaterialTheme.shapes.extraSmall
-                        )
-                ) {
+                Box(modifier = Modifier
+                    .graphicsLayer {
+                        translationX = spaceX + (line.cornerPoints?.get(0)?.x ?: 0) * widthZoomRatio
+                        translationY =
+                            spaceY + (line.cornerPoints?.get(0)?.y ?: 0) * heightZoomRatio
+                        transformOrigin = TransformOrigin(0f, 0f)
+                        rotationZ = getRotationZ(line).toFloat()
+                    }
+                    .offset(
+                        x = -boxHorizontalPadding.pixelToDp(), y = -boxVerticalPadding.pixelToDp()
+                    )
+                    .size(
+                        (realWidth.coerceAtLeast(0f) + boxHorizontalPadding * 2).pixelToDp(),
+                        (realHeight.coerceAtLeast(0f) + boxVerticalPadding * 2).pixelToDp()
+                    )
+                    .background(
+                        color = Color.White.copy(alpha = if (showOriginalText) 0.2f else 0.9f),
+                        shape = MaterialTheme.shapes.extraSmall
+                    )) {
                     if (!showOriginalText) {
                         AutoResizeText(
                             text = textToShow,
@@ -129,8 +125,8 @@ private fun getLineHeight(line: Text.Line): Float {
     line.cornerPoints?.get(3)?.let { bottomPoint ->
         line.cornerPoints?.get(0)?.let { topPoint ->
             return sqrt(
-                (bottomPoint.y - topPoint.y).toDouble().pow(2) +
-                        (bottomPoint.x - topPoint.x).toDouble().pow(2)
+                (bottomPoint.y - topPoint.y).toDouble()
+                    .pow(2) + (bottomPoint.x - topPoint.x).toDouble().pow(2)
             ).toFloat()
         }
     }
@@ -141,8 +137,8 @@ private fun getLineWidth(line: Text.Line): Float {
     line.cornerPoints?.get(1)?.let { rightPoint ->
         line.cornerPoints?.get(0)?.let { leftPoint ->
             return sqrt(
-                (rightPoint.y - leftPoint.y).toDouble().pow(2) +
-                        (rightPoint.x - leftPoint.x).toDouble().pow(2)
+                (rightPoint.y - leftPoint.y).toDouble()
+                    .pow(2) + (rightPoint.x - leftPoint.x).toDouble().pow(2)
             ).toFloat()
         }
     }
@@ -154,8 +150,7 @@ private fun getRotationZ(line: Text.Line): Double {
         line.cornerPoints?.get(1)?.let { rightPoint ->
             return Math.toDegrees(
                 atan2(
-                    (rightPoint.y - leftPoint.y).toDouble(),
-                    (rightPoint.x - leftPoint.x).toDouble()
+                    (rightPoint.y - leftPoint.y).toDouble(), (rightPoint.x - leftPoint.x).toDouble()
                 )
             )
         }

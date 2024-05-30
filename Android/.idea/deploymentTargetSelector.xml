@@ -16,10 +16,13 @@
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="AudioTranslateTopBarPreview - Dark">
+      <SelectionState runConfigName="AudioTranslateTopBarPreview - Light">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="AudioTranslateTopBarPreview - Light">
+      <SelectionState runConfigName="FaceToFaceChatPagePreview - Dark">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="UserDetailsDialogPreview - Light">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

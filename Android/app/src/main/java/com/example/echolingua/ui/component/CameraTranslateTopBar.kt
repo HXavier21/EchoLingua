@@ -99,7 +99,9 @@ fun CameraTranslateTopBar(
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "More",
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier
+                    .padding(10.dp)
+                    .clickable(interactionSource = interactionSource, indication = null) { },
                 tint = Color.White
             )
         }
