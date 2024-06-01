@@ -22,7 +22,7 @@ class TranslatePageViewModel : ViewModel() {
     private val mTranslatedTextFlow = MutableStateFlow("")
     val translatedTextFlow = mTranslatedTextFlow.asStateFlow()
 
-    fun translate(
+    suspend fun translate(
         text: String = ""
     ) {
         Translator.translateWithAutoDetect(text, onSuccessCallback = { translatedText ->
