@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.echolingua.ui.component.AudioTranslateTopBar
+import kotlinx.coroutines.launch
 
 @Composable
 fun TranslatePage(
@@ -41,6 +43,7 @@ fun TranslatePage(
     onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {},
     onNavigateToBackEndTestPage: () -> Unit = {}
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val translatedText by translatePageViewModel.translatedTextFlow.collectAsState()
     val focusManager = LocalFocusManager.current
     var text by remember {
@@ -108,7 +111,9 @@ fun TranslatePage(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = null,
                     modifier = Modifier.clickable {
-                        translatePageViewModel.translate(text)
+                        coroutineScope.launch {
+                            translatePageViewModel.translate(text)
+                        }
                     }
                 )
             }

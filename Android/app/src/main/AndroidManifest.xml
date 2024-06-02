@@ -31,7 +31,8 @@
             android:name=".QuickTranslateActivity"
             android:exported="true"
             android:label="@string/title_activity_quick_translate"
-            android:theme="@style/Theme.TransparentStatusBar">
+            android:theme="@style/Theme.TransparentStatusBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
 

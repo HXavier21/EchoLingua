@@ -8,28 +8,31 @@ import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 
 private const val TAG = "Translator"
 
 object Translator {
 
-    fun translateWithAutoDetect(
+    suspend fun translateWithAutoDetect(
         text: String,
         onSuccessCallback: (String) -> Unit = {},
         sourceLanguage: String = LanguageSelectStateHolder.sourceLanguage.value,
         targetLanguage: String = LanguageSelectStateHolder.targetLanguage.value
     ) {
-        if (LanguageSelectStateHolder.sourceLanguage.value == "detect") {
-            LanguageIdentification.getClient().identifyLanguage(text)
-                .addOnSuccessListener { languageCode ->
-                    translate(text, onSuccessCallback, languageCode, targetLanguage)
-                }
-                .addOnFailureListener { exception ->
-                    Log.e(TAG, "Identify Language: ", exception)
-                }
-        } else {
-            translate(text, onSuccessCallback, sourceLanguage, targetLanguage)
+        withContext(Dispatchers.Default) {
+            if (LanguageSelectStateHolder.sourceLanguage.value == "detect") {
+                LanguageIdentification.getClient().identifyLanguage(text)
+                    .addOnSuccessListener { languageCode ->
+                        translate(text, onSuccessCallback, languageCode, targetLanguage)
+                    }.addOnFailureListener { exception ->
+                        Log.e(TAG, "Identify Language: ", exception)
+                    }
+            } else {
+                translate(text, onSuccessCallback, sourceLanguage, targetLanguage)
+            }
         }
     }
 
@@ -40,35 +43,23 @@ object Translator {
         targetLanguage: String
     ) {
         Log.d(TAG, "translate: $sourceLanguage")
-        val options = TranslatorOptions.Builder()
-            .setSourceLanguage(sourceLanguage)
-            .setTargetLanguage(targetLanguage)
-            .build()
+        val options = TranslatorOptions.Builder().setSourceLanguage(sourceLanguage)
+            .setTargetLanguage(targetLanguage).build()
         val translator = Translation.getClient(options)
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
-        translator.downloadModelIfNeeded(conditions)
-            .addOnSuccessListener {
-                translator.translate(text)
-                    .addOnSuccessListener { translatedText ->
+        val conditions = DownloadConditions.Builder().requireWifi().build()
+        translator.downloadModelIfNeeded(conditions).addOnSuccessListener {
+                translator.translate(text).addOnSuccessListener { translatedText ->
                         Log.d(TAG, "translate: $translatedText")
                         onSuccessCallback(translatedText)
-                    }
-                    .addOnFailureListener { exception ->
+                    }.addOnFailureListener { exception ->
                         Toast.makeText(
-                            App.context,
-                            "Translation failed",
-                            Toast.LENGTH_SHORT
+                            App.context, "Translation failed", Toast.LENGTH_SHORT
                         ).show()
                         Log.e(TAG, "Translate: $exception")
                     }
-            }
-            .addOnFailureListener { exception ->
+            }.addOnFailureListener { exception ->
                 Toast.makeText(
-                    App.context,
-                    "Model download failed",
-                    Toast.LENGTH_LONG
+                    App.context, "Model download failed", Toast.LENGTH_LONG
                 ).show()
                 Log.e(TAG, "Download Model: ", exception)
             }
