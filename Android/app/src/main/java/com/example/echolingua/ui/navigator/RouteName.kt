@@ -8,7 +8,6 @@ object RouteName {
     const val TRANSLATE_PAGES = "translate_pages"
     const val BACK_END_TEST_PAGE = "back_end_test_page"
 
-
     infix fun String.withArgumentKey(key: String) = "$this/{$key}"
 
     infix fun String.withArgument(arg: Any) = "$this/$arg"
