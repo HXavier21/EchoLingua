@@ -23,11 +23,15 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import com.example.echolingua.ui.navigator.MyNavigator
-import com.example.echolingua.ui.page.MainTranslatePage
+import com.example.echolingua.ui.navigator.MainNavigator
+import com.example.echolingua.ui.navigator.TranslatePagesNavigator
+import com.example.echolingua.ui.page.LanguageSelectPage
+import com.example.echolingua.ui.page.LanguageSelectStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
+import com.tencent.mmkv.MMKV
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -41,6 +45,7 @@ class MainActivity : ComponentActivity() {
     private var imageCapture: ImageCapture? = null
 
     private var cameraProvider: ProcessCameraProvider? = null
+    private var cameraControl: CameraControl? = null
 
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
 
@@ -49,7 +54,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EchoLinguaTheme {
-                MyNavigator()
+                MainNavigator()
             }
         }
     }
@@ -57,6 +62,13 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         pickMedia.unregister()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val mmkv = MMKV.defaultMMKV()
+        mmkv.encode("sourceLanguage", LanguageSelectStateHolder.sourceLanguage.value)
+        mmkv.encode("targetLanguage", LanguageSelectStateHolder.targetLanguage.value)
     }
 
     private fun <I, O> ComponentActivity.registerActivityResultLauncher(
@@ -149,7 +161,7 @@ class MainActivity : ComponentActivity() {
             this as LifecycleOwner, cameraSelector, useCaseGroup
         )
 
-        val cameraControl = camera?.cameraControl
+        cameraControl = camera?.cameraControl
 
         cameraControl?.let { initCameraListeners(it) }
     }
@@ -179,6 +191,12 @@ class MainActivity : ComponentActivity() {
         cameraProvider?.unbindAll()
         val previewView = findViewById<PreviewView>(R.id.camera_view)
         previewView.visibility = View.GONE
+    }
+
+    fun switchTorchState(
+        torchState: Boolean
+    ) {
+        cameraControl?.enableTorch(torchState)
     }
 
 }

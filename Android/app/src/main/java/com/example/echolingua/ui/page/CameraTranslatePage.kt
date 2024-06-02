@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,15 +21,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material.icons.filled.FlashOff
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeFloatingActionButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -39,30 +34,30 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.echolingua.MainActivity
 import com.example.echolingua.R
+import com.example.echolingua.ui.component.CameraTranslateTopBar
 import com.example.echolingua.ui.component.FloatingLanguageSelectBlock
 import com.example.echolingua.ui.component.PhotoPreview
 import com.example.echolingua.util.TextRecognizer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.mlkit.nl.translate.TranslateLanguage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 private const val TAG = "CameraTranslatePage"
@@ -72,8 +67,7 @@ private const val TAG = "CameraTranslatePage"
 fun CameraTranslatePage(
     cameraTranslatePageViewModel: CameraTranslatePageViewModel = viewModel(),
     onNavigateBackToTranslatePage: () -> Unit = {},
-    onNavigateToSourceLanguageSelectPage: (SelectMode) -> Unit = {},
-    onNavigateToTargetLanguageSelectPage: (SelectMode) -> Unit = {}
+    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {}
 ) {
     val context = LocalContext.current
     val imageFile by cameraTranslatePageViewModel.imageFileFlow.collectAsState()
@@ -82,7 +76,7 @@ fun CameraTranslatePage(
     var isCaptured by remember { mutableStateOf(false) }
     var width by remember { mutableIntStateOf(0) }
     var height by remember { mutableIntStateOf(0) }
-
+    val coroutine = rememberCoroutineScope()
     val cameraPermissionState =
         rememberPermissionState(permission = Manifest.permission.CAMERA, onPermissionResult = {
             if (it) {
@@ -95,23 +89,30 @@ fun CameraTranslatePage(
         else Manifest.permission.READ_EXTERNAL_STORAGE, onPermissionResult = {
             (context as MainActivity).pickMedia(onSuccess = { uri ->
                 Log.d(TAG, "CameraTranslatePage: $uri")
-                context.contentResolver.openInputStream(uri)?.use {
-                    File.createTempFile("temp", ".jpeg").apply {
-                        writeBytes(it.readBytes())
+                coroutine.launch {
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.use {
+                            File.createTempFile("temp", ".jpeg").apply {
+                                writeBytes(it.readBytes())
+                            }
+                        }?.let {
+                            cameraTranslatePageViewModel.setImageFile(it)
+                        }
                     }
-                }?.let {
-                    cameraTranslatePageViewModel.setImageFile(it)
+                    withContext(Dispatchers.Default) {
+                        TextRecognizer.processImage(imageFile = uri,
+                            language = TranslateLanguage.CHINESE,
+                            refreshRecognizedText = {
+                                cameraTranslatePageViewModel.setRecognizedText(
+                                    it
+                                )
+                            })
+                    }
+                    withContext(Dispatchers.Main) {
+                        isCaptured = true
+                        context.stopCamera()
+                    }
                 }
-                TextRecognizer.processImage(
-                    imageFile = uri,
-                    language = TranslateLanguage.CHINESE,
-                    refreshRecognizedText = {
-                        cameraTranslatePageViewModel.setRecognizedText(
-                            it
-                        )
-                    })
-                isCaptured = true
-                context.stopCamera()
             }, onFailure = {
                 Log.d(TAG, "CameraTranslatePage: No image picked")
                 Toast.makeText(
@@ -153,7 +154,8 @@ fun CameraTranslatePage(
             )
             if (isCaptured) {
                 PhotoPreview(
-                    imageFile = imageFile, recognizeText = recognizedText,
+                    imageFile = imageFile,
+                    recognizeText = recognizedText,
                     showOriginalText = showOriginalText
                 )
             }
@@ -161,100 +163,38 @@ fun CameraTranslatePage(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(95.dp)
-                    ) {
-                        val brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black.copy(alpha = 0.8f),
-                                Color.Black.copy(alpha = 0.5f),
-                                Color.Transparent
-                            )
+                CameraTranslateTopBar(
+                    isCaptured = isCaptured,
+                    onBackClick = {
+                        (context as MainActivity).stopCamera()
+                        onNavigateBackToTranslatePage()
+                    },
+                    onTorchClick = {
+                        (context as MainActivity).switchTorchState(it)
+                    },
+                    onCloseClick = {
+                        isCaptured = false
+                        cameraTranslatePageViewModel.setRecognizedText(
+                            com.google.mlkit.vision.text.Text("", listOf<String>())
                         )
-                        drawRect(
-                            brush = brush,
-                            size = this.size
-                        )
+                        cameraPermissionState.launchPermissionRequest()
                     }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            modifier = Modifier.padding(10.dp),
-                            tint = Color.White
-                        )
-                        Icon(
-                            imageVector = Icons.Default.FlashOff,
-                            contentDescription = "Flash",
-                            modifier = Modifier.padding(10.dp),
-                            tint = Color.White
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "More",
-                            modifier = Modifier.padding(10.dp),
-                            tint = Color.White
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 40.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = buildAnnotatedString {
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.White, fontWeight = FontWeight.Black
-                                    )
-                                ) {
-                                    append("Echo")
-                                }
-                                withStyle(
-                                    style = SpanStyle(
-                                        color = Color.White
-                                    )
-                                ) {
-                                    append("Lingua")
-                                }
-                            },
-                            modifier = Modifier.padding(10.dp),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontStyle = FontStyle.Italic
-                        )
-                    }
-                }
-                FloatingLanguageSelectBlock(
-                    showOriginalText = showOriginalText,
+                )
+                FloatingLanguageSelectBlock(showOriginalText = showOriginalText,
                     onSwitchClick = {
                         cameraTranslatePageViewModel.setShowOriginText(!showOriginalText)
                     },
                     sourceLanguage = LanguageSelectStateHolder.getSourceLanguageDisplayName(),
                     targetLanguage = LanguageSelectStateHolder.getTargetLanguageDisplayName(),
                     onSourceLanguageClick = {
-                        (context as MainActivity).stopCamera()
-                        onNavigateToSourceLanguageSelectPage(SelectMode.SOURCE)
+                        onNavigateToLanguageSelectPage(SelectMode.SOURCE)
                     },
                     onTargetLanguageClick = {
-                        (context as MainActivity).stopCamera()
-                        onNavigateToTargetLanguageSelectPage(SelectMode.TARGET)
+                        onNavigateToLanguageSelectPage(SelectMode.TARGET)
                     },
                     onSwapIconClick = {
                         LanguageSelectStateHolder.swapLanguage()
-                    }
-                )
+                    })
                 Spacer(modifier = Modifier.weight(1f))
                 when (isCaptured) {
                     false -> {
@@ -273,12 +213,13 @@ fun CameraTranslatePage(
                                     contentDescription = "Pick image",
                                     tint = Color.White,
                                     modifier = Modifier
-                                        .clickable {
-                                            mediaPermissionState.launchPermissionRequest()
-                                        }
                                         .background(
                                             Color.Black.copy(alpha = 0.8f), CircleShape
                                         )
+                                        .clip(CircleShape)
+                                        .clickable {
+                                            mediaPermissionState.launchPermissionRequest()
+                                        }
                                         .padding(15.dp))
                             }
 

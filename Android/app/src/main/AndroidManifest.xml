@@ -24,8 +24,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.EchoLingua"
+        android:usesCleartextTraffic="true"
         tools:targetApi="tiramisu">
-<!--        <profileable android:shell="true"/>-->
+        <!--        <profileable android:shell="true"/>-->
         <activity
             android:name=".QuickTranslateActivity"
             android:exported="true"

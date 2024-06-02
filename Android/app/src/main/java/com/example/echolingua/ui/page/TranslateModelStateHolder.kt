@@ -12,13 +12,16 @@ import com.google.mlkit.nl.translate.TranslateRemoteModel
 
 private const val TAG = "TranslateModelStateHold"
 
-enum class TranslateModelStatus {
+enum class TranslateModelState {
     NOT_DOWNLOADED, DOWNLOADING, DOWNLOADED
 }
 
 object TranslateModelStateHolder {
-    private val mModelStateMap = mutableStateMapOf<String, TranslateModelStatus>()
+    private val mModelStateMap = mutableStateMapOf<String, TranslateModelState>()
     val modelStateMap = mModelStateMap
+
+    var currentLanguage = mutableStateOf("")
+    var isManagingModel = mutableStateOf(false)
 
     fun checkIfModelExists(language: String, callback: (Boolean) -> Unit) {
         val modelManager = RemoteModelManager.getInstance()
@@ -34,12 +37,12 @@ object TranslateModelStateHolder {
 
     fun refreshWholeModelStateMap() {
         for (language in TranslateLanguage.getAllLanguages()) {
-            if (mModelStateMap[language] != TranslateModelStatus.DOWNLOADING) {
+            if (mModelStateMap[language] != TranslateModelState.DOWNLOADING) {
                 checkIfModelExists(language) {
                     if (it) {
-                        mModelStateMap[language] = TranslateModelStatus.DOWNLOADED
+                        mModelStateMap[language] = TranslateModelState.DOWNLOADED
                     } else {
-                        mModelStateMap[language] = TranslateModelStatus.NOT_DOWNLOADED
+                        mModelStateMap[language] = TranslateModelState.NOT_DOWNLOADED
                     }
                 }
             }
@@ -47,7 +50,7 @@ object TranslateModelStateHolder {
     }
 
     fun downloadModel(language: String) {
-        mModelStateMap[language] = TranslateModelStatus.DOWNLOADING
+        mModelStateMap[language] = TranslateModelState.DOWNLOADING
         val modelManager = RemoteModelManager.getInstance()
         val model = TranslateRemoteModel.Builder(language).build()
         val conditions = DownloadConditions.Builder()
@@ -55,7 +58,7 @@ object TranslateModelStateHolder {
             .build()
         modelManager.download(model, conditions)
             .addOnSuccessListener {
-                mModelStateMap[language] = TranslateModelStatus.DOWNLOADED
+                mModelStateMap[language] = TranslateModelState.DOWNLOADED
             }
             .addOnFailureListener {
                 Log.e(TAG, "downloadModel: ${it.stackTraceToString()}")
@@ -64,7 +67,29 @@ object TranslateModelStateHolder {
                     "$language Model download failed",
                     Toast.LENGTH_SHORT
                 ).show()
-                mModelStateMap[language] = TranslateModelStatus.NOT_DOWNLOADED
+                mModelStateMap[language] = TranslateModelState.NOT_DOWNLOADED
             }
+    }
+
+    fun deleteModel(language: String) {
+        val modelManager = RemoteModelManager.getInstance()
+        val model = TranslateRemoteModel.Builder(language).build()
+        modelManager.deleteDownloadedModel(model)
+            .addOnSuccessListener {
+                Log.d(TAG, "deleteModel: $language Model deleted")
+                mModelStateMap[language] = TranslateModelState.NOT_DOWNLOADED
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "deleteModel: ${it.stackTraceToString()}")
+                Toast.makeText(
+                    App.context,
+                    "$language Model delete failed",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+    }
+
+    fun getModelState(language: String): TranslateModelState {
+        return mModelStateMap[language] ?: TranslateModelState.NOT_DOWNLOADED
     }
 }

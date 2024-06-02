@@ -25,9 +25,9 @@ class TranslatePageViewModel : ViewModel() {
     fun translate(
         text: String = ""
     ) {
-        Translator.translateWithAutoDetect(text) { translatedText ->
+        Translator.translateWithAutoDetect(text, onSuccessCallback = { translatedText ->
             mTranslatedTextFlow.update { translatedText }
-        }
+        })
     }
 
 }

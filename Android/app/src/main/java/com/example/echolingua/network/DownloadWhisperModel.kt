@@ -21,7 +21,7 @@ sealed interface DownloadStatus {
 }
 
 @CheckResult
-fun downloadModel(
+fun downloadWhisperModel(
     fileUrl: String,
     destinationPath: String,
 ): Flow<DownloadStatus> = flow {

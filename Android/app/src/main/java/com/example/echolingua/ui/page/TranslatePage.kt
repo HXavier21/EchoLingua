@@ -27,22 +27,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.echolingua.ui.component.AudioTranslateTopBar
 
 @Composable
 fun TranslatePage(
     translatePageViewModel: TranslatePageViewModel = viewModel(),
     onNavigateToCameraTranslatePage: () -> Unit = {},
     onNavigateToAudioTranscribePage: () -> Unit = {},
-    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {}
+    onNavigateToLanguageSelectPage: (SelectMode) -> Unit = {},
+    onNavigateToBackEndTestPage: () -> Unit = {}
 ) {
     val translatedText by translatePageViewModel.translatedTextFlow.collectAsState()
+    val focusManager = LocalFocusManager.current
     var text by remember {
         mutableStateOf("")
     }
     Card(modifier = Modifier.fillMaxSize()) {
+        AudioTranslateTopBar()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,6 +67,7 @@ fun TranslatePage(
                         )
                     },
                     onClick = {
+                        focusManager.clearFocus()
                         onNavigateToLanguageSelectPage(SelectMode.SOURCE)
                     }
                 )
@@ -83,6 +89,7 @@ fun TranslatePage(
                         )
                     },
                     onClick = {
+                        focusManager.clearFocus()
                         onNavigateToLanguageSelectPage(SelectMode.TARGET)
                     }
                 )
@@ -124,6 +131,14 @@ fun TranslatePage(
             ) {
                 Text(text = "Camera Translate")
             }
+        }
+        Button(
+            onClick = { onNavigateToBackEndTestPage() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Text(text = "To BackEndTestPage")
         }
     }
 }
