@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.audioTranscribePages
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

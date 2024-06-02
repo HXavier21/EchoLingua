@@ -23,13 +23,10 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.echolingua.ui.navigator.MainNavigator
-import com.example.echolingua.ui.navigator.TranslatePagesNavigator
-import com.example.echolingua.ui.page.LanguageSelectPage
-import com.example.echolingua.ui.page.LanguageSelectStateHolder
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 import com.tencent.mmkv.MMKV
 import java.io.File
@@ -47,7 +44,7 @@ class MainActivity : ComponentActivity() {
     private var cameraProvider: ProcessCameraProvider? = null
     private var cameraControl: CameraControl? = null
 
-    private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
+    private var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +58,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        pickMedia.unregister()
+        pickMedia?.unregister()
     }
 
     override fun onPause() {
@@ -90,7 +87,7 @@ class MainActivity : ComponentActivity() {
                         onSuccess(it)
                     } ?: onFailure()
                 })
-        pickMedia.launch(
+        pickMedia?.launch(
             PickVisualMediaRequest(
                 visualMediaType
             )

@@ -10,16 +10,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.echolingua.ui.navigator.TranslatePagesNavigator
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
+import com.example.echolingua.ui.page.stateHolders.TranslateModelStateHolder
 
 @Composable
 fun PagesAccessToLanguageSelectPage(
     modifier: Modifier = Modifier,
-    onNavigateToBackEndTestPage: () -> Unit
+    onNavigateToBackEndTestPage: () -> Unit,
+    onNavigateToDataPage: () -> Unit
 ) {
     val isSelecting by LanguageSelectStateHolder.isSelecting
     Box(modifier = modifier.fillMaxSize()) {
         TranslatePagesNavigator(
-            onNavigateToBackEndTestPage = onNavigateToBackEndTestPage
+            onNavigateToBackEndTestPage = onNavigateToBackEndTestPage,
+            onNavigateToDataPage = onNavigateToDataPage
         )
         AnimatedVisibility(
             visible = isSelecting,

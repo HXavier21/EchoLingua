@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.stateHolders
 
 import android.util.Log
 import android.widget.Toast

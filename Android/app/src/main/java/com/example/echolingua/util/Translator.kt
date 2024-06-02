@@ -3,13 +3,12 @@ package com.example.echolingua.util
 import android.util.Log
 import android.widget.Toast
 import com.example.echolingua.App
-import com.example.echolingua.ui.page.LanguageSelectStateHolder
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import com.google.mlkit.common.model.DownloadConditions
 import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.google.mlkit.nl.translate.Translation
 import com.google.mlkit.nl.translate.TranslatorOptions
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 
 private const val TAG = "Translator"

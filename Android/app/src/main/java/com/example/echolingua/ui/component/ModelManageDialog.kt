@@ -22,7 +22,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.example.echolingua.ui.page.TranslateModelState
+import com.example.echolingua.ui.page.stateHolders.TranslateModelState
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
 @Composable

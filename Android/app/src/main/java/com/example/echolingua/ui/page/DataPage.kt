@@ -43,9 +43,7 @@ fun DataPage(onNavigateBackToMainTranslatePage: () -> Unit) {
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            modifier = Modifier.padding(start = 10.dp),
-                            tint = MaterialTheme.colorScheme.onSurface
+                            contentDescription = "Back"
                         )
                     }
                 },

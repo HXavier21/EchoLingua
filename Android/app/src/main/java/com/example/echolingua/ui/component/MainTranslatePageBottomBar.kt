@@ -107,7 +107,7 @@ fun MainTranslatePageBottomBar(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     IconButton(
-                        onClick = { onMicClick() },
+                        onClick = {  onNavigateToCameraPage()},
                         modifier = Modifier.scale(1.3f),
                         colors = IconButtonDefaults.iconButtonColors().copy(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer
@@ -121,7 +121,7 @@ fun MainTranslatePageBottomBar(
                 }
             }
             LargeFloatingActionButton(
-                onClick = { onNavigateToCameraPage() },
+                onClick = { onMicClick() },
                 containerColor = MaterialTheme.colorScheme.primary,
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.elevation(

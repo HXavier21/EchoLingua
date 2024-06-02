@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.audioTranscribePages
 
 import android.media.MediaRecorder
 import android.util.Log
@@ -6,14 +6,11 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.echolingua.App
-import com.example.echolingua.App.Companion.context
-import com.example.echolingua.App.Companion.modelsPath
-import com.example.echolingua.App.Companion.whisperContext
 import com.example.echolingua.ffmpeg.FFmpegUtil
-import com.example.echolingua.whisper.WhisperContext
 import com.example.echolingua.media.decodeWaveFile
 import com.example.echolingua.network.DownloadStatus
 import com.example.echolingua.network.downloadWhisperModel
+import com.example.echolingua.whisper.WhisperContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,9 +53,9 @@ class AudioTranscribePageViewModel : ViewModel() {
             val model = mModelStateFlow.value.model ?: return@launch
             val modelName = model.name
             val fileUrl = model.url
-            val destinationPath = context.filesDir.path + "/models/$modelName.bin"
+            val destinationPath = App.context.filesDir.path + "/models/$modelName.bin"
 
-            val models = modelsPath.list()
+            val models = App.modelsPath.list()
 
             if (models == null || !models.contains("$modelName.bin")) {
                 downloadWhisperModel(
@@ -100,7 +97,7 @@ class AudioTranscribePageViewModel : ViewModel() {
                 WhisperContext.createContextFromFile(App.modelsPath.path + "/$modelName.bin")
             }
                 .onSuccess { ctx ->
-                    whisperContext = ctx
+                    App.whisperContext = ctx
                     mModelStateFlow.update { it.copy(status = ModelState.Status.Loaded) }
                     mCanTranscribeFlow.update { true }
                 }
@@ -132,7 +129,7 @@ class AudioTranscribePageViewModel : ViewModel() {
             } catch (e: Exception) {
                 e.printStackTrace()
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context, e.toString(), Toast.LENGTH_LONG).show()
+                    Toast.makeText(App.context, e.toString(), Toast.LENGTH_LONG).show()
                 }
             }
             audioPath = file.path
@@ -153,7 +150,7 @@ class AudioTranscribePageViewModel : ViewModel() {
                 val waveData = decodeWaveFile(storedFile)
 
                 Log.d(TAG, "stopRecording: transcribe start!")
-                whisperContext.transcribeData(
+                App.whisperContext.transcribeData(
                     data = waveData
                 ).let { str ->
                     mTextFlow.update { str }

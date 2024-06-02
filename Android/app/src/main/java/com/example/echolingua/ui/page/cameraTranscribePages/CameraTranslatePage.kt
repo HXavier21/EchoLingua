@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.cameraTranscribePages
 
 import android.Manifest
 import android.os.Build
@@ -51,6 +51,8 @@ import com.example.echolingua.R
 import com.example.echolingua.ui.component.CameraTranslateTopBar
 import com.example.echolingua.ui.component.FloatingLanguageSelectBlock
 import com.example.echolingua.ui.component.PhotoPreview
+import com.example.echolingua.ui.page.SelectMode
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import com.example.echolingua.util.TextRecognizer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
