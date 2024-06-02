@@ -13,10 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.ContentPaste
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -47,7 +49,7 @@ private const val TAG = "TranslateInputTextField"
 fun TranslateInputTextField(
     modifier: Modifier = Modifier,
     initialText: String = "",
-    onEnterPressed: () -> Unit,
+    onEnterPressed: (String) -> Unit,
     pasteText: (String) -> Unit = {}
 ) {
     var text by remember { mutableStateOf(TextFieldValue()) }
@@ -62,7 +64,7 @@ fun TranslateInputTextField(
     val isButtonVisible = remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
 
-    LaunchedEffect(initialText) {
+    LaunchedEffect(Unit) {
         text = TextFieldValue(
             text = initialText, selection = TextRange(initialText.length)
         )
@@ -81,7 +83,8 @@ fun TranslateInputTextField(
                 .matchParentSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            TextField(value = text,
+            TextField(
+                value = text,
                 onValueChange = { text = it },
                 placeholder = {
                     Text(
@@ -89,6 +92,17 @@ fun TranslateInputTextField(
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.headlineLarge
                     )
+                },
+                trailingIcon = {
+                    if (text.text.isNotEmpty()) {
+                        IconButton(onClick = {
+                            text = TextFieldValue("")
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Clear, contentDescription = "Clear"
+                            )
+                        }
+                    }
                 },
                 textStyle = MaterialTheme.typography.headlineLarge,
                 colors = TextFieldDefaults.colors(
@@ -101,7 +115,7 @@ fun TranslateInputTextField(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(onDone = {
-                    onEnterPressed() // 当按下回车键时触发
+                    onEnterPressed(text.text) // 当按下回车键时触发
                 }),
                 modifier = Modifier
                     .padding(top = 4.dp)
@@ -114,26 +128,31 @@ fun TranslateInputTextField(
                     .focusRequester(focusRequester) // 使用FocusRequester修饰输入框
 
             )
-            Button(
-                onClick = {
-                    clipboardManager.getText()?.let {
-                        pasteText(it.text)
-                        Log.d(TAG, "TranslateInputTextField: ${it.text}")
-                    }
-                },
-                colors = ButtonDefaults.buttonColors().copy(
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                modifier = Modifier.padding(20.dp),
-                contentPadding = PaddingValues(horizontal = 15.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.ContentPaste,
-                    contentDescription = "Paste",
-                    modifier = Modifier.scale(0.8f)
-                )
-                Text(text = "Paste", modifier = Modifier.padding(horizontal = 6.dp))
+            if (text.text.isEmpty()) {
+                Button(
+                    onClick = {
+                        clipboardManager.getText()?.let {
+                            pasteText(it.text)
+                            text = TextFieldValue(
+                                text = it.text, selection = TextRange(it.text.length)
+                            )
+                            Log.d(TAG, "TranslateInputTextField: ${it.text}")
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors().copy(
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    modifier = Modifier.padding(20.dp),
+                    contentPadding = PaddingValues(horizontal = 15.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.ContentPaste,
+                        contentDescription = "Paste",
+                        modifier = Modifier.scale(0.8f)
+                    )
+                    Text(text = "Paste", modifier = Modifier.padding(horizontal = 6.dp))
+                }
             }
         }
     }

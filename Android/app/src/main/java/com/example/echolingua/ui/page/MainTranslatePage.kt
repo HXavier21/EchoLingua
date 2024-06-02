@@ -26,14 +26,24 @@ fun MainTranslatePage(
     var showPage by remember { mutableStateOf(currentPage) }
     val sourceText by mainTranslatePageViewModel.sourceTextFlow.collectAsState()
     val targetText by mainTranslatePageViewModel.targetTextFlow.collectAsState()
+    val sourceLanguage = LanguageSelectStateHolder.getSourceLanguageDisplayName()
+    val targetLanguage = LanguageSelectStateHolder.getTargetLanguageDisplayName()
     when (showPage) {
         PageState.HOME_PAGE -> {
             TranslateHomePage(onShowPageChange = {
                 showPage = PageState.INPUT_PAGE
-            }, onNavigateToDataPage = onNavigateToDataPage, pasteText = {
-                mainTranslatePageViewModel.setSourceText(it)
-                showPage = PageState.INPUT_PAGE
-            })
+            },
+                onNavigateToDataPage = onNavigateToDataPage,
+                pasteText = {
+                    mainTranslatePageViewModel.setSourceText(it)
+                    showPage = PageState.INPUT_PAGE
+                },
+                sourceLanguage = sourceLanguage,
+                targetLanguage = targetLanguage,
+                onSwapLanguageClick = {
+                    LanguageSelectStateHolder.swapLanguage()
+                },
+                onLanguageSelectClick = {})
         }
 
         PageState.INPUT_PAGE -> {
@@ -41,13 +51,20 @@ fun MainTranslatePage(
                 showPage = it
             }, pasteText = {
                 mainTranslatePageViewModel.setSourceText(it)
+            }, setSourceText = {
+                mainTranslatePageViewModel.setSourceText(it)
             })
         }
 
         PageState.DISPLAY_PAGE -> {
-            TranslateResultPage(onShowPageChange = {
-                showPage = it
-            })
+            TranslateResultPage(
+                sourceLanguage = sourceLanguage,
+                targetLanguage = targetLanguage,
+                sourceText = sourceText,
+                targetText = targetText,
+                onShowPageChange = {
+                    showPage = it
+                })
         }
     }
 }

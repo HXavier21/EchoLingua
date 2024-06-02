@@ -26,13 +26,15 @@ fun TranslateInputPage(
     modifier: Modifier = Modifier,
     onShowPageChange: (PageState) -> Unit,
     sourceText: String = "",
-    pasteText: (String) -> Unit = {}
+    pasteText: (String) -> Unit = {},
+    setSourceText: (String) -> Unit = {}
 ) {
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
         Column {
             val focusRequester = remember { FocusRequester() }
             BackHandler {
                 onShowPageChange(PageState.HOME_PAGE)
+                setSourceText("")
             }
             TranslateInputNavigationBar(onBackClick = {
                 onShowPageChange(PageState.HOME_PAGE)
@@ -51,6 +53,7 @@ fun TranslateInputPage(
                     pasteText = { pasteText(it) },
                     onEnterPressed = {
                         onShowPageChange(PageState.DISPLAY_PAGE)
+                        setSourceText(it)
                     })
                 MainPageLanguageSelector(
                     modifier = Modifier

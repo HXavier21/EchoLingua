@@ -37,13 +37,14 @@ fun TranslateHomePage(
     modifier: Modifier = Modifier,
     onNavigateToDataPage: () -> Unit = {},
     onShowPageChange: () -> Unit = {},
-    onSourceLanguageClick: () -> Unit = {},
-    onTargetLanguageClick: () -> Unit = {},
+    onLanguageSelectClick: (SelectMode) -> Unit = {},
     onSwapLanguageClick: () -> Unit = {},
     onNavigateToChatPage: () -> Unit = {},
     onNavigateToCameraPage: () -> Unit = {},
     onMicClick: () -> Unit = {},
-    pasteText: (String) -> Unit = {}
+    pasteText: (String) -> Unit = {},
+    sourceLanguage: String = "Source",
+    targetLanguage: String = "Target"
 ) {
     val clipboardManager = LocalClipboardManager.current
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
@@ -103,9 +104,11 @@ fun TranslateHomePage(
                 modifier = Modifier
                     .padding(horizontal = 20.dp)
                     .padding(top = 10.dp),
-                onSourceLanguageClick = onSourceLanguageClick,
-                onTargetLanguageClick = onTargetLanguageClick,
-                onSwapLanguageClick = onSwapLanguageClick
+                onSourceLanguageClick = { onLanguageSelectClick(SelectMode.SOURCE) },
+                onTargetLanguageClick = { onLanguageSelectClick(SelectMode.TARGET) },
+                onSwapLanguageClick = onSwapLanguageClick,
+                sourceLanguage = sourceLanguage,
+                targetLanguage = targetLanguage
             )
             MainTranslatePageBottomBar(
                 modifier = Modifier.padding(vertical = 24.dp),
