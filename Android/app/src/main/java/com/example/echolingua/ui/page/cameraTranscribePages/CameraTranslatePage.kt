@@ -165,23 +165,18 @@ fun CameraTranslatePage(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CameraTranslateTopBar(
-                    isCaptured = isCaptured,
-                    onBackClick = {
-                        (context as MainActivity).stopCamera()
-                        onNavigateBackToTranslatePage()
-                    },
-                    onTorchClick = {
-                        (context as MainActivity).switchTorchState(it)
-                    },
-                    onCloseClick = {
-                        isCaptured = false
-                        cameraTranslatePageViewModel.setRecognizedText(
-                            com.google.mlkit.vision.text.Text("", listOf<String>())
-                        )
-                        cameraPermissionState.launchPermissionRequest()
-                    }
-                )
+                CameraTranslateTopBar(isCaptured = isCaptured, onBackClick = {
+                    (context as MainActivity).stopCamera()
+                    onNavigateBackToTranslatePage()
+                }, onTorchClick = {
+                    (context as MainActivity).switchTorchState(it)
+                }, onCloseClick = {
+                    isCaptured = false
+                    cameraTranslatePageViewModel.setRecognizedText(
+                        com.google.mlkit.vision.text.Text("", listOf<String>())
+                    )
+                    cameraPermissionState.launchPermissionRequest()
+                })
                 FloatingLanguageSelectBlock(showOriginalText = showOriginalText,
                     onSwitchClick = {
                         cameraTranslatePageViewModel.setShowOriginText(!showOriginalText)
@@ -204,7 +199,7 @@ fun CameraTranslatePage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
-                                .padding(bottom = 20.dp),
+                                .padding(bottom = 24.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {

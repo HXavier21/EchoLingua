@@ -13,13 +13,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.component.MainPageLanguageSelector
-import com.example.echolingua.ui.component.TranslateInputTextField
 import com.example.echolingua.ui.component.TranslateInputNavigationBar
+import com.example.echolingua.ui.component.TranslateInputTextField
 import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 
@@ -36,6 +36,7 @@ fun TranslateInputPage(
     onLanguageSelectClick: (SelectMode) -> Unit = {},
     onSwapLanguageClick: () -> Unit = {}
 ) {
+    val focusManager = LocalFocusManager.current
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
         Column {
             BackHandler {
@@ -68,8 +69,14 @@ fun TranslateInputPage(
                         .padding(vertical = 10.dp),
                     textPadding = 0.dp,
                     shape = MaterialTheme.shapes.extraLarge,
-                    onSourceLanguageClick = { onLanguageSelectClick(SelectMode.SOURCE) },
-                    onTargetLanguageClick = { onLanguageSelectClick(SelectMode.TARGET) },
+                    onSourceLanguageClick = {
+                        onLanguageSelectClick(SelectMode.SOURCE)
+                        focusManager.clearFocus()
+                    },
+                    onTargetLanguageClick = {
+                        onLanguageSelectClick(SelectMode.TARGET)
+                        focusManager.clearFocus()
+                    },
                     onSwapLanguageClick = onSwapLanguageClick,
                     sourceLanguage = sourceLanguage,
                     targetLanguage = targetLanguage

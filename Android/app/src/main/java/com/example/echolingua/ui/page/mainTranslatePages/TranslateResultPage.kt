@@ -56,7 +56,7 @@ fun TranslateResultPage(
     sourceText: String = "",
     targetText: String = "",
     onShowPageChange: (PageState) -> Unit = {},
-    onTTSClick: (String) -> Unit = {},
+    onTTSClick: (String, String) -> Unit = { _, _ -> },
     onLanguageSelectClick: (SelectMode) -> Unit = {},
     onSourceTextClick: () -> Unit = {},
     setSourceText: (String) -> Unit = {},
@@ -70,7 +70,6 @@ fun TranslateResultPage(
     val directionalLazyListState = rememberDirectionalLazyListState(
         lazyListState
     )
-    val direction = directionalLazyListState.scrollDirection
 
 
     LaunchedEffect(sourceText, sourceLanguage, targetLanguage) {
@@ -125,7 +124,11 @@ fun TranslateResultPage(
                                     modifier = Modifier.fillMaxWidth(),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(onClick = { onTTSClick(sourceText) }) {
+                                    IconButton(onClick = {
+                                        onTTSClick(
+                                            sourceText, sourceLanguage
+                                        )
+                                    }) {
                                         Icon(
                                             imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
                                             contentDescription = "report"
@@ -181,7 +184,11 @@ fun TranslateResultPage(
                                         modifier = Modifier.fillMaxWidth(),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        IconButton(onClick = { onTTSClick(targetText) }) {
+                                        IconButton(onClick = {
+                                            onTTSClick(
+                                                targetText, targetLanguage
+                                            )
+                                        }) {
                                             Icon(
                                                 imageVector = Icons.AutoMirrored.Outlined.VolumeUp,
                                                 contentDescription = "report",

@@ -90,6 +90,10 @@ object LanguageSelectStateHolder {
         return languageMap[languageKey] ?: ""
     }
 
+    fun getKeyByDisplayName(displayName: String): String {
+        return languageMap.filterValues { it == displayName }.keys.firstOrNull() ?: ""
+    }
+
     fun navigateToLanguageSelectPage(selectMode: SelectMode) {
         this.selectMode.value = selectMode
         isSelecting.value = true

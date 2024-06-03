@@ -1,6 +1,7 @@
 package com.example.echolingua.ui.page.audioTranscribePages
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,9 @@ fun FaceToFaceChatPage(
 ) {
     var sourceText by remember { mutableStateOf("") }
     var targetText by remember { mutableStateOf("") }
+    BackHandler {
+        onCloseClick()
+    }
     LaunchedEffect(Unit) {
         Translator.translateWithAutoDetect(
             "Tap the microphone button to start",
@@ -47,7 +51,7 @@ fun FaceToFaceChatPage(
         )
     }
     Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize().padding(top = 30.dp)) {
             FaceToFaceChatItem(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -10,6 +10,7 @@ import com.example.echolingua.ffmpeg.FFmpegUtil
 import com.example.echolingua.media.decodeWaveFile
 import com.example.echolingua.network.DownloadStatus
 import com.example.echolingua.network.downloadWhisperModel
+import com.example.echolingua.ui.page.stateHolders.WhisperModelStateHolder
 import com.example.echolingua.whisper.WhisperContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,7 @@ private const val TAG = "AudioTranscribePageView"
 
 class AudioTranscribePageViewModel : ViewModel() {
     data class ModelState(
-        val model: Model? = null,
+        val model: WhisperModelStateHolder.Model? = null,
         val status: Status = Status.NotDownloaded
     ) {
         sealed interface Status {
@@ -44,7 +45,7 @@ class AudioTranscribePageViewModel : ViewModel() {
 
     private var audioPath: String = ""
 
-    fun selectModel(model: Model) {
+    fun selectModel(model: WhisperModelStateHolder.Model) {
         mModelStateFlow.update { it.copy(model = model) }
     }
 

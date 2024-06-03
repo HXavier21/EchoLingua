@@ -35,39 +35,34 @@ fun DataPage(onNavigateBackToMainTranslatePage: () -> Unit) {
     ) {
 
         Column {
-            TopAppBar(
-                title = { /*TODO*/ },
-                navigationIcon = {
-                    IconButton(
-                        onClick = onNavigateBackToMainTranslatePage
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                actions = {
+            TopAppBar(title = { /*TODO*/ }, navigationIcon = {
+                IconButton(
+                    onClick = onNavigateBackToMainTranslatePage
+                ) {
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back"
+                    )
+                }
+            }, actions = {
+                IconButton(onClick = { /*TODO*/ }) {
                     Icon(
                         imageVector = Icons.Filled.Autorenew,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                )
+            })
 
             Text(
                 text = "已保存",
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier
-                    .padding(top = 20.dp, start = 20.dp)
+                modifier = Modifier.padding(top = 20.dp, start = 20.dp)
 
 
             )
             Column(
-                modifier = Modifier
-                    .padding(top = 200.dp)
+                modifier = Modifier.padding(top = 200.dp)
             ) {
                 Row {
                     Spacer(modifier = Modifier.weight(1f))
@@ -83,8 +78,7 @@ fun DataPage(onNavigateBackToMainTranslatePage: () -> Unit) {
                     Text(
                         text = "保存关键短语",
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .padding(top = 10.dp)
+                        modifier = Modifier.padding(top = 10.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f))
                 }
@@ -93,8 +87,7 @@ fun DataPage(onNavigateBackToMainTranslatePage: () -> Unit) {
                     Text(
                         text = "点按星标图标即可保存您最常用的翻译",
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier
-                            .padding(top = 10.dp)
+                        modifier = Modifier.padding(top = 10.dp)
                     )
                     Spacer(modifier = Modifier.weight(1f))
                 }
@@ -112,8 +105,7 @@ fun DataPagePreview() {
 }
 
 @Preview(
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-    showBackground = true
+    uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true
 )
 @Composable
 fun DarkModeDataPagePreview() {

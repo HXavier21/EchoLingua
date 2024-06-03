@@ -51,6 +51,7 @@ fun MainPageLanguageSelector(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(vertical = textPadding),
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -79,6 +80,7 @@ fun MainPageLanguageSelector(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(vertical = textPadding),
+                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
         }

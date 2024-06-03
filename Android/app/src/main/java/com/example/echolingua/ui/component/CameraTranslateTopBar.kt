@@ -19,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,9 @@ fun CameraTranslateTopBar(
     onCloseClick: () -> Unit = {}
 ) {
     var isTorchOn by remember { mutableStateOf(false) }
+    LaunchedEffect(key1 = isCaptured) {
+        isTorchOn = false
+    }
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -115,7 +119,7 @@ fun CameraTranslateTopBar(
                 text = buildAnnotatedString {
                     withStyle(
                         style = SpanStyle(
-                            color = Color.White, fontWeight = FontWeight.Black
+                            color = Color.White, fontWeight = FontWeight.Bold
                         )
                     ) {
                         append("Echo")

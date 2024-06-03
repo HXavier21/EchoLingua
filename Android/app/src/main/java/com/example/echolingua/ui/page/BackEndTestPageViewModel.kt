@@ -20,7 +20,7 @@ import java.io.File
 
 private const val TAG = "BackEndTestPageViewMode"
 
-const val address = "http://frp-fit.top:15501"
+const val address = "http://frp-add.top:15874"
 
 class BackEndTestPageViewModel : ViewModel() {
     private val mMessage = MutableStateFlow("")

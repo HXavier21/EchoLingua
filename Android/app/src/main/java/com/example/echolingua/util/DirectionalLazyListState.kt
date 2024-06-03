@@ -11,6 +11,7 @@ class DirectionalLazyListState(
 ) {
     private var positionY = lazyListState.firstVisibleItemScrollOffset
     private var visibleItem = lazyListState.firstVisibleItemIndex
+    private var direction = ScrollDirection.Up
 
     val scrollDirection by derivedStateOf {
         val firstVisibleItemIndex = lazyListState.firstVisibleItemIndex
@@ -18,19 +19,22 @@ class DirectionalLazyListState(
 
         // We are scrolling while first visible item hasn't changed yet
         if (firstVisibleItemIndex == visibleItem) {
-            val direction = if (firstVisibleItemScrollOffset > positionY) {
+            direction = if (firstVisibleItemScrollOffset > positionY + 10) {
                 ScrollDirection.Down
-            } else {
+            } else if (firstVisibleItemScrollOffset < positionY - 10) {
                 ScrollDirection.Up
+            } else {
+                direction
             }
             positionY = firstVisibleItemScrollOffset
             direction
         } else {
-
-            val direction = if (firstVisibleItemIndex > visibleItem) {
+            direction = if (firstVisibleItemScrollOffset > positionY + 10) {
                 ScrollDirection.Down
-            } else {
+            } else if (firstVisibleItemScrollOffset < positionY - 10) {
                 ScrollDirection.Up
+            } else {
+                direction
             }
             positionY = firstVisibleItemScrollOffset
             visibleItem = firstVisibleItemIndex
