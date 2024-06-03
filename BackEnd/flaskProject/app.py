@@ -1,103 +1,149 @@
-from flask import Flask, request
-import requests
-import hashlib
-import hmac
+"""
+route:
+    @app.route('/')
+    @app.route('/register', methods=['POST'])
+    @app.route('/login', methods=['POST'])
+    @app.route('/get_user_history', methods=['GET'])
+    @app.route('/merge_history', methods=['PUT'])
+    @app.route('/translate', methods=['POST'])
+    @app.route('/get_tts_service', methods=['GET', 'POST'])
+"""
+
+
+# import
 import json
+import os
+import subprocess
 import sys
 import time
-from datetime import datetime
-from http.client import HTTPSConnection
+import requests
+from flask import Flask, request, jsonify, Response
 
+# personal import
+from settings import mysql_path, localhost, json_path
+from get_service import get_tencent_service
+import user_operation.history_operation as history
+import user_operation.login as lo
+import user_operation.register as re
+from get_service.mysql_database import db
+
+# set path
+parent_pid = os.getpid()
+root_dir = os.getcwd()
+sys.path.append(root_dir)
+sys.path.append(".\\get_service\\")
+sys.path.append(".\\get_service\\GPT_SoVITS\\")
+
+# set tts model
+model_name = ['Asta', 'Keqing']
+model_port = {}
+model_pid = {}
+port = 9880
+for name in model_name:
+    model_port[name] = port
+    port += 10
+
+# set application
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = mysql_path
+
+# set the database
+db.init_app(app)
 
 
-def sign(key, msg):
-    return hmac.new(key, msg.encode("utf-8"), hashlib.sha256).digest()
+def start_tts(model):
+    with open(json_path, "r", encoding="utf-8") as f:
+        models_information = json.load(f)
+        model_information = models_information.get(model)
+        if model_information is None:
+            raise ValueError(f"No information found for model: {model}")
+
+    sovits_path = model_information["sovits_path"]
+    gpt_path = model_information["gpt_path"]
+    refer_wav_path = model_information["refer_wav_path"]
+    prompt_text = model_information["prompt_text"]
+    prompt_language = model_information["prompt_language"]
+    command = f'python.exe D:/code/SoftwareEngineering/EchoLingua/BackEnd/flaskProject/get_service/tts_api.py -s {sovits_path} -g {gpt_path} -dr {refer_wav_path} -dt {prompt_text} -dl {prompt_language} -p {model_port.get(model)}'
+    p = subprocess.Popen(command, shell=True, cwd='./get_service')
+    return p.pid
+
+
+# start the tts service
+for model in model_name:
+    pid = start_tts(model)
+    time.sleep(20)
+    print(pid)
+    model_pid[model] = pid
+    print('will start:' + model)
+
+
+# all route
+@app.route('/')
+def hello():
+    return "EchoLingua,gogogo!!!"
+
+
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    message = re.register(data)
+    return message
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    message = lo.login(data)
+    return message
+
+
+@app.route('/get_user_history', methods=['GET'])
+def get_user_history():
+    email = request.args.get('email')  # 获取用户邮箱
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    user_history = history.get_user_history(email)
+    return jsonify(user_history)
+
+
+# API 路由，接收客户端序列化的本地历史记录列表并合并到数据库
+@app.route('/merge_history', methods=['PUT'])
+def merge_history():
+    email = request.args.get('email')
+    data = request.get_json()
+    message = history.merge_history(email, data)
+    return message
 
 
 @app.route('/translate', methods=['POST'])
 def translate():
-    get_data = request.get_data()
-    data = json.loads(get_data)
-
-    secret_id = "AKIDIUSHtw00tffXTH0b5TvKYZMG1ZvLixBI"
-    secret_key = "1tkV9rYGnDXmureGfrvtyymVRL9zpiXE"
-    token = ""
-
-    service = "tmt"
-    host = "tmt.tencentcloudapi.com"
-    region = "ap-chongqing"
-    version = "2018-03-21"
-    action = "TextTranslate"
-    payload = {"SourceText": data["SourceText"],
-               "Source": data["Source"],
-               "Target": data["Target"],
-               "ProjectId": 0}
-    params = json.dumps(payload)
-    endpoint = "https://tmt.tencentcloudapi.com"
-    algorithm = "TC3-HMAC-SHA256"
-    timestamp = int(time.time())
-    date = datetime.utcfromtimestamp(timestamp).strftime("%Y-%m-%d")
-
-    # ************* 步骤 1：拼接规范请求串 *************
-    http_request_method = "POST"
-    canonical_uri = "/"
-    canonical_querystring = ""
-    ct = "application/json; charset=utf-8"
-    canonical_headers = "content-type:%s\nhost:%s\nx-tc-action:%s\n" % (ct, host, action.lower())
-    signed_headers = "content-type;host;x-tc-action"
-    hashed_request_payload = hashlib.sha256(params.encode("utf-8")).hexdigest()
-    canonical_request = (http_request_method + "\n" +
-                         canonical_uri + "\n" +
-                         canonical_querystring + "\n" +
-                         canonical_headers + "\n" +
-                         signed_headers + "\n" +
-                         hashed_request_payload)
-
-    # ************* 步骤 2：拼接待签名字符串 *************
-    credential_scope = date + "/" + service + "/" + "tc3_request"
-    hashed_canonical_request = hashlib.sha256(canonical_request.encode("utf-8")).hexdigest()
-    string_to_sign = (algorithm + "\n" +
-                      str(timestamp) + "\n" +
-                      credential_scope + "\n" +
-                      hashed_canonical_request)
-
-    # ************* 步骤 3：计算签名 *************
-    secret_date = sign(("TC3" + secret_key).encode("utf-8"), date)
-    secret_service = sign(secret_date, service)
-    secret_signing = sign(secret_service, "tc3_request")
-    signature = hmac.new(secret_signing, string_to_sign.encode("utf-8"), hashlib.sha256).hexdigest()
-
-    # ************* 步骤 4：拼接 Authorization *************
-    authorization = (algorithm + " " +
-                     "Credential=" + secret_id + "/" + credential_scope + ", " +
-                     "SignedHeaders=" + signed_headers + ", " +
-                     "Signature=" + signature)
-
-    # ************* 步骤 5：构造并发起请求 *************
-    headers = {
-        "Authorization": authorization,
-        "Content-Type": "application/json; charset=utf-8",
-        "Host": host,
-        "X-TC-Action": action,
-        "X-TC-Timestamp": timestamp,
-        "X-TC-Version": version
-    }
-    if region:
-        headers["X-TC-Region"] = region
-    if token:
-        headers["X-TC-Token"] = token
-
-    try:
-        req = HTTPSConnection(host)
-        req.request("POST", "/", headers=headers, body=params.encode("utf-8"))
-        resp = req.getresponse()
-        response_data = resp.read().decode("utf-8")
-        return response_data
-    except Exception as err:
-        return str(err)
+    data = request.get_json()
+    email = request.args.get('email')
+    message = get_tencent_service.get_tencent_service(data, email)
+    response = json.loads(message).get('Response')
+    print(response)
+    return response['TargetText']
 
 
+@app.route('/get_tts_service', methods=['GET', 'POST'])
+def get_tts_service():
+    if request.method == 'GET':
+        params = request.args.to_dict()
+        name = request.args.get('model')
+        url = localhost + str(model_port.get(name))
+        response = requests.get(url=url, params=params)
+        return Response(response, mimetype="audio/wav")
+    if request.method == 'POST':
+        json_data = request.get_json()
+        name = json_data.get('model')
+        url = localhost + str(model_port.get(name))
+        data = json.dumps(json_data)
+        response = requests.post(url=url, data=data)
+        return Response(response, mimetype="audio/wav")
 
+
+# main
 if __name__ == '__main__':
-    app.run()
+    if os.getpid() == parent_pid:
+        app.run()
