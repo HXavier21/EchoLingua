@@ -1,9 +1,10 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.stateHolders
 
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.mutableStateOf
 import com.example.echolingua.App
+import com.example.echolingua.ui.page.SelectMode
 import com.google.mlkit.nl.translate.TranslateLanguage
 import com.tencent.mmkv.MMKV
 import java.util.Locale
@@ -67,16 +68,13 @@ object LanguageSelectStateHolder {
         sourceLanguage: String = mSourceLanguage.value
     ): String {
         return when (sourceLanguage) {
-            "" -> {
-                "Source"
-            }
 
             "detect" -> {
                 "Auto detect"
             }
 
             else -> {
-                languageMap[sourceLanguage] ?: ""
+                languageMap[sourceLanguage] ?: "Source"
             }
         }
     }
@@ -84,19 +82,16 @@ object LanguageSelectStateHolder {
     fun getTargetLanguageDisplayName(
         targetLanguage: String = mTargetLanguage.value
     ): String {
-        return when (targetLanguage) {
-            "" -> {
-                "Target"
-            }
+        return languageMap[targetLanguage] ?: "Target"
 
-            else -> {
-                languageMap[targetLanguage] ?: ""
-            }
-        }
     }
 
     fun getDisplayNameByKey(languageKey: String): String {
         return languageMap[languageKey] ?: ""
+    }
+
+    fun getKeyByDisplayName(displayName: String): String {
+        return languageMap.filterValues { it == displayName }.keys.firstOrNull() ?: ""
     }
 
     fun navigateToLanguageSelectPage(selectMode: SelectMode) {

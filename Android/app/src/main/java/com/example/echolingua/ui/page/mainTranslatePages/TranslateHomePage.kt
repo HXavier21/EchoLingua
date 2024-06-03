@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.mainTranslatePages
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,8 +19,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
@@ -30,7 +35,10 @@ import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.component.MainPageLanguageSelector
 import com.example.echolingua.ui.component.MainPageNavigationBar
 import com.example.echolingua.ui.component.MainTranslatePageBottomBar
+import com.example.echolingua.ui.component.UserDetailsDialog
+import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.theme.EchoLinguaTheme
+import com.example.echolingua.util.Recorder
 
 @Composable
 fun TranslateHomePage(
@@ -39,17 +47,22 @@ fun TranslateHomePage(
     onShowPageChange: () -> Unit = {},
     onLanguageSelectClick: (SelectMode) -> Unit = {},
     onSwapLanguageClick: () -> Unit = {},
-    onNavigateToChatPage: () -> Unit = {},
+    onNavigateToAudioTranscribePage: () -> Unit = {},
     onNavigateToCameraPage: () -> Unit = {},
-    onMicClick: () -> Unit = {},
+    onRecordStart: () -> Unit = {},
+    onRecordEnd: () -> Unit = {},
     pasteText: (String) -> Unit = {},
     sourceLanguage: String = "Source",
-    targetLanguage: String = "Target"
+    targetLanguage: String = "Target",
+    onSettingClick: () -> Unit = {}
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val isTranscribe by Recorder.isTranscribe
+    var isUserDialogVisible by remember { mutableStateOf(false) }
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
         Column {
-            MainPageNavigationBar(onNavigateToDataPage = onNavigateToDataPage)
+            MainPageNavigationBar(onNavigateToDataPage = onNavigateToDataPage,
+                onProfileClick = { isUserDialogVisible = true })
             Box(
                 modifier = Modifier.weight(1f)
             ) {
@@ -65,18 +78,29 @@ fun TranslateHomePage(
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.surface)
                         .clickable(interactionSource = remember { MutableInteractionSource() }, // 设置interactionSource
-                            indication = null,
-                            onClick = {
+                            indication = null, onClick = {
                                 onShowPageChange()
                             })
                 ) {
-                    Text(
-                        text = "Enter text",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
+                    TextField(value = "",
+                        onValueChange = { },
+                        enabled = false,
+                        placeholder = {
+                            Text(
+                                if (isTranscribe) "Transcribing..." else "Enter text",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.headlineLarge,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        },
+                        textStyle = MaterialTheme.typography.headlineLarge,
+                        colors = TextFieldDefaults.colors(
+                            disabledContainerColor = MaterialTheme.colorScheme.surface,
+                            disabledIndicatorColor = MaterialTheme.colorScheme.surface
+                        ),
                         modifier = Modifier
-                            .padding(20.dp)
-                            .padding(top = 4.dp)
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
                     )
                     Button(
                         onClick = {
@@ -112,9 +136,15 @@ fun TranslateHomePage(
             )
             MainTranslatePageBottomBar(
                 modifier = Modifier.padding(vertical = 24.dp),
-                onNavigateToChatPage = onNavigateToChatPage,
-                onMicClick = onMicClick,
+                onNavigateToChatPage = onNavigateToAudioTranscribePage,
+                onRecordStart = onRecordStart,
+                onRecordEnd = onRecordEnd,
                 onNavigateToCameraPage = onNavigateToCameraPage
+            )
+        }
+        if (isUserDialogVisible) {
+            UserDetailsDialog(
+                onDismissRequest = { isUserDialogVisible = false }, onSettingClick = onSettingClick
             )
         }
     }

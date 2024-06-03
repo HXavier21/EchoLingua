@@ -42,6 +42,8 @@ import com.example.echolingua.ui.component.ContentAfterTranslate
 import com.example.echolingua.ui.component.ContentBeforeTranslate
 import com.example.echolingua.ui.component.TransformMode
 import com.example.echolingua.ui.component.QuickTranslatePageTopBar
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
+import com.example.echolingua.ui.page.stateHolders.TranslateModelStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 import com.example.echolingua.util.Translator
 import kotlinx.coroutines.launch

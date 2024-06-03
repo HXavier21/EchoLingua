@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.StarOutline
 import androidx.compose.material.icons.rounded.ChatBubble
 import androidx.compose.material.icons.rounded.ChatBubbleOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,14 +24,16 @@ import com.example.echolingua.ui.theme.EchoLinguaTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AudioTranslateTopBar(
-    onBackClick: () -> Unit = {}, onChatClick: () -> Unit = {}, onSettingClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onChatClick: () -> Unit = {},
+    onStarClick: () -> Unit = {},
+    onSettingClick: () -> Unit = {}
 ) {
     TopAppBar(title = { }, navigationIcon = {
         IconButton(onClick = { onBackClick() }) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                modifier = Modifier.padding(10.dp)
+                contentDescription = "Back"
             )
         }
     }, actions = {
@@ -56,11 +59,13 @@ fun AudioTranslateTopBar(
                 )
             )
         }
+        IconButton(onClick = { onStarClick() }) {
+            Icon(imageVector = Icons.Outlined.StarOutline, contentDescription = "Star")
+        }
         IconButton(onClick = { onSettingClick() }) {
             Icon(
                 imageVector = Icons.Outlined.Settings,
-                contentDescription = "Settings",
-                modifier = Modifier.padding(horizontal = 10.dp)
+                contentDescription = "Settings"
             )
         }
     })

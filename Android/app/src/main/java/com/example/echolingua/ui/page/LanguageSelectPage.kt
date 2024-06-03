@@ -39,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.component.LanguageSelectItem
 import com.example.echolingua.ui.component.ModelManageDialog
 import com.example.echolingua.ui.component.TopSearchBar
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
+import com.example.echolingua.ui.page.stateHolders.TranslateModelState
+import com.example.echolingua.ui.page.stateHolders.TranslateModelStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 import com.google.mlkit.nl.translate.TranslateLanguage
 

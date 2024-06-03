@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.echolingua.ui.page.TranslateModelState
+import com.example.echolingua.ui.page.stateHolders.TranslateModelState
 
 @Composable
 fun LanguageSelectItem(

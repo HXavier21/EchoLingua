@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.cameraTranscribePages
 
 import android.Manifest
 import android.os.Build
@@ -51,6 +51,8 @@ import com.example.echolingua.R
 import com.example.echolingua.ui.component.CameraTranslateTopBar
 import com.example.echolingua.ui.component.FloatingLanguageSelectBlock
 import com.example.echolingua.ui.component.PhotoPreview
+import com.example.echolingua.ui.page.SelectMode
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import com.example.echolingua.util.TextRecognizer
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -163,23 +165,18 @@ fun CameraTranslatePage(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                CameraTranslateTopBar(
-                    isCaptured = isCaptured,
-                    onBackClick = {
-                        (context as MainActivity).stopCamera()
-                        onNavigateBackToTranslatePage()
-                    },
-                    onTorchClick = {
-                        (context as MainActivity).switchTorchState(it)
-                    },
-                    onCloseClick = {
-                        isCaptured = false
-                        cameraTranslatePageViewModel.setRecognizedText(
-                            com.google.mlkit.vision.text.Text("", listOf<String>())
-                        )
-                        cameraPermissionState.launchPermissionRequest()
-                    }
-                )
+                CameraTranslateTopBar(isCaptured = isCaptured, onBackClick = {
+                    (context as MainActivity).stopCamera()
+                    onNavigateBackToTranslatePage()
+                }, onTorchClick = {
+                    (context as MainActivity).switchTorchState(it)
+                }, onCloseClick = {
+                    isCaptured = false
+                    cameraTranslatePageViewModel.setRecognizedText(
+                        com.google.mlkit.vision.text.Text("", listOf<String>())
+                    )
+                    cameraPermissionState.launchPermissionRequest()
+                })
                 FloatingLanguageSelectBlock(showOriginalText = showOriginalText,
                     onSwitchClick = {
                         cameraTranslatePageViewModel.setShowOriginText(!showOriginalText)
@@ -202,7 +199,7 @@ fun CameraTranslatePage(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight()
-                                .padding(bottom = 20.dp),
+                                .padding(bottom = 24.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {

@@ -1,7 +1,6 @@
 package com.example.echolingua.ui.component
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -20,7 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,44 +34,51 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.theme.CustomRippleTheme
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.sqrt
 
 private const val TAG = "MicButton"
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MicButton(
+    modifier: Modifier = Modifier,
     initialRecordState: Boolean = false,
     onRecordStart: () -> Unit = {},
     onRecordEnd: () -> Unit = {},
 ) {
     var isRecording by remember { mutableStateOf(initialRecordState) }
     val animatedCornerSize by animateIntAsState(
-        targetValue = if (isRecording) 10 else 50,
-        label = ""
+        targetValue = if (isRecording) 10 else 50, label = ""
     )
     val scaleRatio by animateFloatAsState(
-        targetValue = if (isRecording) 0.53f else 0.75f,
-        label = ""
+        targetValue = if (isRecording) 0.75f / sqrt(2f) else 0.75f, label = ""
     )
     var buttonAngle by remember {
         mutableFloatStateOf(0f)
     }
     val animateButtonAngle by animateFloatAsState(
-        targetValue = buttonAngle,
-        label = "",
-        animationSpec = tween(1000, easing = LinearEasing)
+        targetValue = buttonAngle, label = "", animationSpec = tween(1000, easing = LinearEasing)
     )
     val coroutineScope = rememberCoroutineScope()
+    val recordPermissionState =
+        rememberPermissionState(permission = android.Manifest.permission.RECORD_AUDIO) {
+            if (it) {
+                if (!isRecording) onRecordStart()
+                else onRecordEnd()
+                isRecording = !isRecording
+            }
+        }
     DisposableEffect(Unit) {
         coroutineScope.launch {
             withContext(Dispatchers.Main) {
-                buttonAngle = System.currentTimeMillis() % 360f
                 while (true) {
-                    Log.d(TAG, "MicButton: $buttonAngle")
                     buttonAngle += 80f
                     delay(1000)
                 }
@@ -83,7 +88,9 @@ fun MicButton(
             coroutineScope.cancel()
         }
     }
-    Box(contentAlignment = Alignment.Center) {
+    Box(
+        modifier = modifier, contentAlignment = Alignment.Center
+    ) {
         LargeFloatingActionButton(
             onClick = {},
             containerColor = MaterialTheme.colorScheme.primary,
@@ -92,27 +99,22 @@ fun MicButton(
                 .padding(horizontal = 10.dp)
                 .scale(scaleRatio)
                 .graphicsLayer(rotationZ = 45f + animateButtonAngle),
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 0.dp, pressedElevation = 0.dp
+            )
         ) {}
         CompositionLocalProvider(LocalRippleTheme provides CustomRippleTheme()) {
             LargeFloatingActionButton(
                 onClick = {
-                    if (isRecording) {
-                        onRecordEnd()
-                    } else {
-                        onRecordStart()
-
-                    }
-                    isRecording = !isRecording
+                    recordPermissionState.launchPermissionRequest()
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(animatedCornerSize),
                 modifier = Modifier
-                    .padding(horizontal = 10.dp)
                     .scale(scaleRatio)
                     .graphicsLayer(rotationZ = animateButtonAngle),
                 elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp
+                    defaultElevation = 0.dp, pressedElevation = 0.dp
                 )
             ) {}
             val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
