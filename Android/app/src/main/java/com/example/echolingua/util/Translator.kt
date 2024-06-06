@@ -45,22 +45,31 @@ object Translator {
         val options = TranslatorOptions.Builder().setSourceLanguage(sourceLanguage)
             .setTargetLanguage(targetLanguage).build()
         val translator = Translation.getClient(options)
-        val conditions = DownloadConditions.Builder().requireWifi().build()
-        translator.downloadModelIfNeeded(conditions).addOnSuccessListener {
-                translator.translate(text).addOnSuccessListener { translatedText ->
-                        Log.d(TAG, "translate: $translatedText")
-                        onSuccessCallback(translatedText)
-                    }.addOnFailureListener { exception ->
-                        Toast.makeText(
-                            App.context, "Translation failed", Toast.LENGTH_SHORT
-                        ).show()
-                        Log.e(TAG, "Translate: $exception")
-                    }
-            }.addOnFailureListener { exception ->
-                Toast.makeText(
-                    App.context, "Model download failed", Toast.LENGTH_LONG
-                ).show()
-                Log.e(TAG, "Download Model: ", exception)
-            }
+//          val conditions = DownloadConditions.Builder().build()
+//        translator.downloadModelIfNeeded(conditions).addOnSuccessListener {
+//            translator.translate(text).addOnSuccessListener { translatedText ->
+//                Log.d(TAG, "translate: $translatedText")
+//                onSuccessCallback(translatedText)
+//            }.addOnFailureListener { exception ->
+//                Toast.makeText(
+//                    App.context, "Translation failed", Toast.LENGTH_SHORT
+//                ).show()
+//                Log.e(TAG, "Translate: $exception")
+//            }
+//        }.addOnFailureListener { exception ->
+//            Toast.makeText(
+//                App.context, "Model download failed", Toast.LENGTH_LONG
+//            ).show()
+//            Log.e(TAG, "Download Model: ", exception)
+//        }
+        translator.translate(text).addOnSuccessListener { translatedText ->
+            Log.d(TAG, "translate: $translatedText")
+            onSuccessCallback(translatedText)
+        }.addOnFailureListener { exception ->
+            Toast.makeText(
+                App.context, "Translation failed", Toast.LENGTH_SHORT
+            ).show()
+            Log.e(TAG, "Translate: $exception")
+        }
     }
 }

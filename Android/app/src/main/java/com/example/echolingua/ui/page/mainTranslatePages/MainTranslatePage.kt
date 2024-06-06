@@ -3,7 +3,6 @@ package com.example.echolingua.ui.page.mainTranslatePages
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +20,6 @@ import com.example.echolingua.ui.page.stateHolders.WhisperModelStateHolder
 import com.example.echolingua.util.OnlineServiceUtil
 import com.example.echolingua.util.Recorder
 import com.example.echolingua.util.Translator
-import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,19 +49,12 @@ fun MainTranslatePage(
     val textStyle by mainTranslatePageViewModel.textStyleFlow.collectAsState()
     val sourceLanguage = LanguageSelectStateHolder.getSourceLanguageDisplayName()
     val targetLanguage = LanguageSelectStateHolder.getTargetLanguageDisplayName()
-    LaunchedEffect(Unit) {
-        val mmkv = MMKV.defaultMMKV()
-        for (model in WhisperModelStateHolder.ModelList) {
-            if (model.name == mmkv.decodeString("selectedModel", "")) {
-                WhisperModelStateHolder.loadModel(model)
-            }
-        }
-    }
     when (showPage) {
         PageState.HOME_PAGE -> {
-            TranslateHomePage(onShowPageChange = {
-                showPage = PageState.INPUT_PAGE
-            },
+            TranslateHomePage(
+                onShowPageChange = {
+                    showPage = PageState.INPUT_PAGE
+                },
                 onNavigateToDataPage = onNavigateToDataPage,
                 pasteText = {
                     mainTranslatePageViewModel.setSourceText(it)
@@ -88,12 +79,17 @@ fun MainTranslatePage(
                 },
                 onRecordEnd = {
                     coroutine.launch {
-                        Recorder.stopRecording {
+                        Recorder.stopRecording(language = sourceLanguage) {
                             mainTranslatePageViewModel.setSourceText(it)
                         }
                         showPage = PageState.INPUT_PAGE
                     }
 
+                },
+                onRecordCancel = {
+                    coroutine.launch {
+                        Recorder.cancelRecording()
+                    }
                 },
                 onSettingClick = onSettingClick
             )
@@ -105,9 +101,6 @@ fun MainTranslatePage(
                     showPage = it
                 },
                 pasteText = {
-                    mainTranslatePageViewModel.setSourceText(it)
-                },
-                setSourceText = {
                     mainTranslatePageViewModel.setSourceText(it)
                 },
                 sourceLanguage = sourceLanguage,
@@ -128,10 +121,9 @@ fun MainTranslatePage(
                 sourceText = sourceText,
                 targetText = targetText,
                 onShowPageChange = {
+                    mainTranslatePageViewModel.setSourceText("")
+                    mainTranslatePageViewModel.setTargetText("")
                     showPage = it
-                },
-                setSourceText = {
-                    mainTranslatePageViewModel.setSourceText(it)
                 },
                 onLanguageSelectClick = onLanguageSelectClick,
                 onSourceTextClick = {
@@ -140,7 +132,7 @@ fun MainTranslatePage(
                 onTTSClick = { text, language ->
                     coroutine.launch {
                         OnlineServiceUtil.getTTSService(text = text,
-                            language = LanguageSelectStateHolder.getKeyByDisplayName(language),
+                            language = language,
                             onResponseCallback = { response ->
                                 coroutine.launch {
                                     val file = File.createTempFile("tempAudio", ".wav")
@@ -193,9 +185,12 @@ fun MainTranslatePage(
         }
 
         PageState.AUDIO_PAGE -> {
-            TranslateAudioPage(onBackClick = {
-                showPage = PageState.HOME_PAGE
-            },
+            TranslateAudioPage(
+                onBackClick = {
+                    mainTranslatePageViewModel.setSourceText("")
+                    mainTranslatePageViewModel.setTargetText("")
+                    showPage = PageState.HOME_PAGE
+                },
                 sourceLanguage = sourceLanguage,
                 targetLanguage = targetLanguage,
                 onSwapLanguageClick = {
@@ -203,19 +198,37 @@ fun MainTranslatePage(
                 },
                 onLanguageSelectClick = onLanguageSelectClick,
                 onRecordStart = {
+                    mainTranslatePageViewModel.setSourceText("")
+                    mainTranslatePageViewModel.setTargetText("")
                     if (WhisperModelStateHolder.canTranscribe.value) {
                         coroutine.launch {
                             Recorder.startRecording()
                         }
                     }
                 },
-                onRecordEnd = {
+                onRecordEnd = { language, callback ->
                     coroutine.launch {
-                        Recorder.stopRecording {
-                            mainTranslatePageViewModel.setSourceText(it)
+                        Recorder.stopRecording(language) {
+                            callback(it)
                         }
                     }
-                })
+                },
+                sourceText = sourceText,
+                targetText = targetText,
+                setTargetText = {
+                    mainTranslatePageViewModel.setTargetText(it)
+                },
+                setSourceText = {
+                    mainTranslatePageViewModel.setSourceText(it)
+                },
+                updateStyleCallback = {
+                    mainTranslatePageViewModel.setTextStyle(it)
+                },
+                onDetailsClick = {
+                    showPage = PageState.DISPLAY_PAGE
+
+                }
+            )
         }
     }
 }

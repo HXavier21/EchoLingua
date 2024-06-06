@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import com.example.echolingua.App
 import com.example.echolingua.ffmpeg.FFmpegUtil
 import com.example.echolingua.media.decodeWaveFile
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,12 +16,17 @@ private const val TAG = "Recorder"
 
 object Recorder {
 
-    private var mIsTranscribe = mutableStateOf(false)
-    val isTranscribe = mIsTranscribe
+    enum class RecorderState {
+        UNAVAILABLE, IDLE, RECORDING, TRANSCRIBING
+    }
+
+    private var mRecordState = mutableStateOf(RecorderState.IDLE)
+    val recordState = mRecordState
 
     private var audioPath: String = ""
 
     suspend fun startRecording() {
+        mRecordState.value = RecorderState.RECORDING
         withContext(Dispatchers.IO) {
             val time = System.currentTimeMillis() / 1000L
             val file = getTempFileForRecording(time)
@@ -47,9 +53,11 @@ object Recorder {
 
     }
 
-    suspend fun stopRecording(transcribeCallback: (String) -> Unit = {}) {
-        isTranscribe.value = true
+    suspend fun stopRecording(
+        language: String = "auto", transcribeCallback: (String) -> Unit = {}
+    ) {
         withContext(Dispatchers.IO) {
+            mRecordState.value = RecorderState.TRANSCRIBING
             App.mediaRecorder.stop()
             App.mediaRecorder.reset()
             File(audioPath).let {
@@ -60,14 +68,32 @@ object Recorder {
                 val waveData = decodeWaveFile(storedFile)
 
                 Log.d(TAG, "stopRecording: transcribe start!")
-                App.whisperContext.transcribeData(
-                    data = waveData
-                ).let { str ->
-                    isTranscribe.value = false
+                App.whisperContext.transcribeData(data = waveData,
+                    language = LanguageSelectStateHolder.getKeyByDisplayName(language)
+                        .ifEmpty { "auto" }).let { str ->
+                    mRecordState.value = RecorderState.IDLE
                     transcribeCallback(str)
                     Log.d(TAG, "stopRecording: transcribe end! $str")
                 }
             }
+            mRecordState.value = RecorderState.IDLE
+        }
+    }
+
+    suspend fun cancelRecording() {
+        withContext(Dispatchers.IO) {
+            when (mRecordState.value) {
+                RecorderState.IDLE -> return@withContext
+                RecorderState.RECORDING -> {
+                    App.mediaRecorder.stop()
+                    App.mediaRecorder.reset()
+                    File(audioPath).delete()
+                }
+
+                else -> {
+                }
+            }
+            mRecordState.value = RecorderState.IDLE
         }
     }
 

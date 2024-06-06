@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,18 +28,16 @@ fun TranslateInputPage(
     sourceText: String = "",
     updateStyleCallback: (TextStyle) -> Unit = {},
     pasteText: (String) -> Unit = {},
-    setSourceText: (String) -> Unit = {},
     sourceLanguage: String = "Source",
     targetLanguage: String = "Target",
     onLanguageSelectClick: (SelectMode) -> Unit = {},
-    onSwapLanguageClick: () -> Unit = {}
+    onSwapLanguageClick: () -> Unit = {},
 ) {
     val focusManager = LocalFocusManager.current
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
         Column {
             BackHandler {
                 onShowPageChange(PageState.HOME_PAGE)
-                setSourceText("")
             }
             TranslateInputNavigationBar(onBackClick = {
                 onShowPageChange(PageState.HOME_PAGE)
@@ -58,8 +54,8 @@ fun TranslateInputPage(
                     initialText = sourceText,
                     pasteText = { pasteText(it) },
                     onEnterPressed = {
+                        pasteText(it)
                         onShowPageChange(PageState.DISPLAY_PAGE)
-                        setSourceText(it)
                     },
                     updateStyleCallback = updateStyleCallback
                 )

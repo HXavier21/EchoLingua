@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.quickTranslatePages
 
 import android.content.res.Configuration
 import android.view.Gravity
@@ -38,10 +38,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.echolingua.QuickTranslateActivity
-import com.example.echolingua.ui.component.ContentAfterTranslate
-import com.example.echolingua.ui.component.ContentBeforeTranslate
-import com.example.echolingua.ui.component.TransformMode
 import com.example.echolingua.ui.component.QuickTranslatePageTopBar
+import com.example.echolingua.ui.page.LanguageSelectPage
+import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import com.example.echolingua.ui.page.stateHolders.TranslateModelStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
