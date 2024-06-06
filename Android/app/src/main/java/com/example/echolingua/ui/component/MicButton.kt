@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.MicNone
 import androidx.compose.material.ripple.LocalRippleTheme
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -21,7 +22,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -34,6 +34,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.theme.CustomRippleTheme
+import com.example.echolingua.util.Recorder
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
@@ -49,11 +50,12 @@ private const val TAG = "MicButton"
 @Composable
 fun MicButton(
     modifier: Modifier = Modifier,
-    initialRecordState: Boolean = false,
+    recordState: Recorder.RecorderState = Recorder.RecorderState.IDLE,
     onRecordStart: () -> Unit = {},
     onRecordEnd: () -> Unit = {},
+    onUnavailableClick: () -> Unit = {}
 ) {
-    var isRecording by remember { mutableStateOf(initialRecordState) }
+    val isRecording = recordState == Recorder.RecorderState.RECORDING
     val animatedCornerSize by animateIntAsState(
         targetValue = if (isRecording) 10 else 50, label = ""
     )
@@ -70,9 +72,7 @@ fun MicButton(
     val recordPermissionState =
         rememberPermissionState(permission = android.Manifest.permission.RECORD_AUDIO) {
             if (it) {
-                if (!isRecording) onRecordStart()
-                else onRecordEnd()
-                isRecording = !isRecording
+                onRecordStart()
             }
         }
     DisposableEffect(Unit) {
@@ -106,7 +106,12 @@ fun MicButton(
         CompositionLocalProvider(LocalRippleTheme provides CustomRippleTheme()) {
             LargeFloatingActionButton(
                 onClick = {
-                    recordPermissionState.launchPermissionRequest()
+                    when (recordState) {
+                        Recorder.RecorderState.IDLE -> recordPermissionState.launchPermissionRequest()
+                        Recorder.RecorderState.RECORDING -> onRecordEnd()
+                        Recorder.RecorderState.UNAVAILABLE -> onUnavailableClick()
+                        else -> {}
+                    }
                 },
                 containerColor = MaterialTheme.colorScheme.primary,
                 shape = RoundedCornerShape(animatedCornerSize),
@@ -118,14 +123,8 @@ fun MicButton(
                 )
             ) {}
             val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
-            when (isRecording) {
-                false -> Icon(
-                    imageVector = Icons.Outlined.MicNone,
-                    contentDescription = "Mic",
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-
-                true -> Canvas(modifier = Modifier.matchParentSize()) {
+            when (recordState) {
+                Recorder.RecorderState.RECORDING -> Canvas(modifier = Modifier.matchParentSize()) {
                     drawLine(
                         start = Offset(size.width / 2 - 15, size.height / 2 - 10),
                         end = Offset(size.width / 2 - 15, size.height / 2 + 10),
@@ -141,6 +140,18 @@ fun MicButton(
                         cap = StrokeCap.Round
                     )
                 }
+
+                Recorder.RecorderState.TRANSCRIBING -> Icon(
+                    imageVector = Icons.Default.MoreHoriz,
+                    contentDescription = "Wait",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+
+                else -> Icon(
+                    imageVector = Icons.Outlined.MicNone,
+                    contentDescription = "Mic",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
             }
         }
     }
@@ -155,5 +166,5 @@ fun MicButtonPreview() {
 @Composable
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark")
 fun MicButtonDarkPreview() {
-    MicButton(initialRecordState = true)
+    MicButton(recordState = Recorder.RecorderState.RECORDING)
 }

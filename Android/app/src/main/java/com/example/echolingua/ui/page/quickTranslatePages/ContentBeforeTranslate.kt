@@ -1,4 +1,4 @@
-package com.example.echolingua.ui.component
+package com.example.echolingua.ui.page.quickTranslatePages
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContent

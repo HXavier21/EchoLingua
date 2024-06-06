@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,8 +34,9 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.component.MainPageLanguageSelector
-import com.example.echolingua.ui.component.MainPageNavigationBar
-import com.example.echolingua.ui.component.MainTranslatePageBottomBar
+import com.example.echolingua.ui.component.TranslateHomePageBottomBar
+import com.example.echolingua.ui.component.TranslateHomePageTopBar
+import com.example.echolingua.ui.component.TranslateRecordingTopBar
 import com.example.echolingua.ui.component.UserDetailsDialog
 import com.example.echolingua.ui.page.SelectMode
 import com.example.echolingua.ui.theme.EchoLinguaTheme
@@ -51,18 +53,30 @@ fun TranslateHomePage(
     onNavigateToCameraPage: () -> Unit = {},
     onRecordStart: () -> Unit = {},
     onRecordEnd: () -> Unit = {},
+    onRecordCancel: () -> Unit = {},
     pasteText: (String) -> Unit = {},
     sourceLanguage: String = "Source",
     targetLanguage: String = "Target",
     onSettingClick: () -> Unit = {}
 ) {
     val clipboardManager = LocalClipboardManager.current
-    val isTranscribe by Recorder.isTranscribe
+    val recorderState by Recorder.recordState
+    val readyToRecord = recorderState == Recorder.RecorderState.IDLE
     var isUserDialogVisible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+
+    }
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
         Column {
-            MainPageNavigationBar(onNavigateToDataPage = onNavigateToDataPage,
-                onProfileClick = { isUserDialogVisible = true })
+            if (!readyToRecord) {
+                TranslateRecordingTopBar(
+                    onBackClick = { onRecordCancel() },
+                    onBackClickEnabled = recorderState != Recorder.RecorderState.TRANSCRIBING
+                )
+            } else {
+                TranslateHomePageTopBar(onNavigateToDataPage = onNavigateToDataPage,
+                    onProfileClick = { isUserDialogVisible = true })
+            }
             Box(
                 modifier = Modifier.weight(1f)
             ) {
@@ -78,7 +92,7 @@ fun TranslateHomePage(
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.surface)
                         .clickable(interactionSource = remember { MutableInteractionSource() }, // 设置interactionSource
-                            indication = null, onClick = {
+                            indication = null, enabled = readyToRecord, onClick = {
                                 onShowPageChange()
                             })
                 ) {
@@ -87,7 +101,11 @@ fun TranslateHomePage(
                         enabled = false,
                         placeholder = {
                             Text(
-                                if (isTranscribe) "Transcribing..." else "Enter text",
+                                text = when (recorderState) {
+                                    Recorder.RecorderState.RECORDING -> "Recording..."
+                                    Recorder.RecorderState.IDLE -> "Enter text"
+                                    else -> "Transcribing..."
+                                },
                                 color = MaterialTheme.colorScheme.onSurface,
                                 style = MaterialTheme.typography.headlineLarge,
                                 modifier = Modifier.fillMaxWidth()
@@ -108,6 +126,7 @@ fun TranslateHomePage(
                                 pasteText(it.text)
                             }
                         },
+                        enabled = readyToRecord,
                         colors = ButtonDefaults.buttonColors().copy(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             contentColor = MaterialTheme.colorScheme.onSurface
@@ -132,14 +151,16 @@ fun TranslateHomePage(
                 onTargetLanguageClick = { onLanguageSelectClick(SelectMode.TARGET) },
                 onSwapLanguageClick = onSwapLanguageClick,
                 sourceLanguage = sourceLanguage,
-                targetLanguage = targetLanguage
+                targetLanguage = targetLanguage,
+                enabled = readyToRecord
             )
-            MainTranslatePageBottomBar(
+            TranslateHomePageBottomBar(
                 modifier = Modifier.padding(vertical = 24.dp),
                 onNavigateToChatPage = onNavigateToAudioTranscribePage,
                 onRecordStart = onRecordStart,
                 onRecordEnd = onRecordEnd,
-                onNavigateToCameraPage = onNavigateToCameraPage
+                onNavigateToCameraPage = onNavigateToCameraPage,
+                recordState = recorderState
             )
         }
         if (isUserDialogVisible) {

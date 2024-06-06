@@ -2,6 +2,7 @@ package com.example.echolingua.util
 
 import com.example.echolingua.network.HttpUtil
 import com.example.echolingua.ui.page.address
+import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.IOException
@@ -26,7 +27,9 @@ object OnlineServiceUtil {
                     onResponseCallback(response)
                 }
             }, requestBody = generateRequestBody(
-                "model" to model, "text" to text, "text_language" to language
+                "model" to model,
+                "text" to text,
+                "text_language" to LanguageSelectStateHolder.getKeyByDisplayName(language)
             )
         )
     }

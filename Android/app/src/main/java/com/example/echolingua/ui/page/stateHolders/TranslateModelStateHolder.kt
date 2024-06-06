@@ -53,9 +53,7 @@ object TranslateModelStateHolder {
         mModelStateMap[language] = TranslateModelState.DOWNLOADING
         val modelManager = RemoteModelManager.getInstance()
         val model = TranslateRemoteModel.Builder(language).build()
-        val conditions = DownloadConditions.Builder()
-            .requireWifi()
-            .build()
+        val conditions = DownloadConditions.Builder().build()
         modelManager.download(model, conditions)
             .addOnSuccessListener {
                 mModelStateMap[language] = TranslateModelState.DOWNLOADED

@@ -23,10 +23,12 @@ import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.runtime.LaunchedEffect
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import com.example.echolingua.ui.navigator.MainNavigator
 import com.example.echolingua.ui.page.stateHolders.LanguageSelectStateHolder
+import com.example.echolingua.ui.page.stateHolders.WhisperModelStateHolder
 import com.example.echolingua.ui.theme.EchoLinguaTheme
 import com.tencent.mmkv.MMKV
 import java.io.File
@@ -51,6 +53,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             EchoLinguaTheme {
+                LaunchedEffect(Unit) {
+                    val mmkv = MMKV.defaultMMKV()
+                    for (model in WhisperModelStateHolder.ModelList) {
+                        if (model.name == mmkv.decodeString("selectedModel", "")) {
+                            WhisperModelStateHolder.loadModel(model)
+                        }
+                    }
+                }
                 MainNavigator()
             }
         }

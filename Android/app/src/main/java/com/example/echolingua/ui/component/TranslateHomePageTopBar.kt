@@ -33,7 +33,7 @@ import com.example.echolingua.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainPageNavigationBar(onNavigateToDataPage: () -> Unit = {}, onProfileClick: () -> Unit = {}) {
+fun TranslateHomePageTopBar(onNavigateToDataPage: () -> Unit = {}, onProfileClick: () -> Unit = {}) {
     TopAppBar(title = {
         Row(
             modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center

@@ -1,11 +1,10 @@
 package com.example.echolingua.whisper
 
-import android.content.res.AssetManager
-import android.os.Build
 import android.util.Log
-import kotlinx.coroutines.*
-import java.io.File
-import java.io.InputStream
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.util.concurrent.Executors
 
 private const val LOG_TAG = "LibWhisper"
@@ -18,15 +17,11 @@ class WhisperContext private constructor(private var ptr: Long) {
     )
 
     suspend fun transcribeData(
-        data: FloatArray,
-        progressCallback: (Int) -> Unit = { }
+        data: FloatArray, progressCallback: (Int) -> Unit = { }, language: String = "auto"
     ): String = withContext(scope.coroutineContext) {
         require(ptr != 0L)
         WhisperLib.fullTranscribe(
-            contextPtr = ptr,
-            language = "auto",
-            progressCallback = object :
-                ProgressCallback() {
+            contextPtr = ptr, language = language, progressCallback = object : ProgressCallback() {
                 override fun onUpdate(progress: Int) {
                     Log.d(TAG, "onUpdate: $progress")
                     progressCallback(progress)

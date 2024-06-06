@@ -59,7 +59,6 @@ fun TranslateResultPage(
     onTTSClick: (String, String) -> Unit = { _, _ -> },
     onLanguageSelectClick: (SelectMode) -> Unit = {},
     onSourceTextClick: () -> Unit = {},
-    setSourceText: (String) -> Unit = {},
     translateSourceText: (String) -> Unit = {}
 ) {
     val clipboardManager = LocalClipboardManager.current
@@ -71,13 +70,11 @@ fun TranslateResultPage(
         lazyListState
     )
 
-
     LaunchedEffect(sourceText, sourceLanguage, targetLanguage) {
         translateSourceText(sourceText)
     }
     BackHandler {
         onShowPageChange(PageState.HOME_PAGE)
-        setSourceText("")
     }
     Box(
         modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd
@@ -248,7 +245,6 @@ fun TranslateResultPage(
         ExtendedFloatingActionButton(
             onClick = {
                 onShowPageChange(PageState.INPUT_PAGE)
-                setSourceText("")
             },
             icon = { Icon(Icons.Filled.Add, "New Translation") },
             text = { Text(text = "New Translation") },

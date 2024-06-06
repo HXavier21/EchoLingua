@@ -15,7 +15,7 @@ class App : Application() {
         context = applicationContext
         System.loadLibrary("x264")
         System.loadLibrary("app")
-        modelsPath = File(filesDir, "models")
+        modelsPath = File(filesDir, "whisperModels")
         audioPath = File(filesDir, "audio")
         imagePath = File(filesDir, "image")
         modelsPath.mkdirs()

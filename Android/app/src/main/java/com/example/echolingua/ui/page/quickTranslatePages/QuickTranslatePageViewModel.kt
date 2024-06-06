@@ -1,7 +1,6 @@
-package com.example.echolingua.ui.page
+package com.example.echolingua.ui.page.quickTranslatePages
 
 import androidx.lifecycle.ViewModel
-import com.example.echolingua.ui.component.TransformMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
