@@ -1,6 +1,6 @@
-# EchoLingua
-## 项目成员：贺翔、曹沛、王思维、陈哲
-### 项目目标：
+# *EchoLingua*
+A translation App which looks exactly like ***Google Translate***
+## 项目目标：
 1. 支持文本、语音、图像输入
 2. 支持文本、语音结果输出
 3. 翻译历史
