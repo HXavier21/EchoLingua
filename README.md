@@ -5,6 +5,8 @@
 
 A translation App which looks exactly like ***Google Translate***
 
+</div>
+
 ## Screenshots
 
 <div align="center">
@@ -20,11 +22,10 @@ A translation App which looks exactly like ***Google Translate***
 </div>
 </div>
 
-## 项目目标
-1. 支持文本、语音、图像输入
-2. 支持文本、语音结果输出
-3. 翻译历史
-4. 翻译设置
-5. 用于测试的后端
-6. 后端服务（翻译、语音合成、语音识别、OCR）交互
-7. 预留离线模型使用接口
+## Features
+- Offline Neural Machine Translation by [Google ML Kit](https://developers.google.com/ml-kit/language/translation)
+- Offline Text Recognition by [Google ML Kit](https://developers.google.com/ml-kit/vision/text-recognition/v2)
+- Offline Audio Transcribe by [whisper.cpp](https://github.com/ggerganov/whisper.cpp)
+- Translate everywhere with QuickTranslatePage (also Google-like)
+- Online TTS deployed on BackEnd (Offline VITS on the way)
+- Translation History on the way
