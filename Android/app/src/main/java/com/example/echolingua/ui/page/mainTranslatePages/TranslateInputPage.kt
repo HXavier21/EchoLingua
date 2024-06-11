@@ -27,7 +27,7 @@ fun TranslateInputPage(
     onShowPageChange: (PageState) -> Unit,
     sourceText: String = "",
     updateStyleCallback: (TextStyle) -> Unit = {},
-    pasteText: (String) -> Unit = {},
+    setSourceText: (String) -> Unit = {},
     sourceLanguage: String = "Source",
     targetLanguage: String = "Target",
     onLanguageSelectClick: (SelectMode) -> Unit = {},
@@ -38,9 +38,11 @@ fun TranslateInputPage(
         Column {
             BackHandler {
                 onShowPageChange(PageState.HOME_PAGE)
+                setSourceText("")
             }
             TranslateInputNavigationBar(onBackClick = {
                 onShowPageChange(PageState.HOME_PAGE)
+                setSourceText("")
             })
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -52,9 +54,9 @@ fun TranslateInputPage(
                 TranslateInputTextField(
                     modifier = Modifier.weight(1f),
                     initialText = sourceText,
-                    pasteText = { pasteText(it) },
+                    setSourceText = { setSourceText(it) },
                     onEnterPressed = {
-                        pasteText(it)
+                        setSourceText(it)
                         onShowPageChange(PageState.DISPLAY_PAGE)
                     },
                     updateStyleCallback = updateStyleCallback

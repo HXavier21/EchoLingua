@@ -54,18 +54,15 @@ fun TranslateHomePage(
     onRecordStart: () -> Unit = {},
     onRecordEnd: () -> Unit = {},
     onRecordCancel: () -> Unit = {},
-    pasteText: (String) -> Unit = {},
     sourceLanguage: String = "Source",
     targetLanguage: String = "Target",
-    onSettingClick: () -> Unit = {}
+    onSettingClick: () -> Unit = {},
+    setSourceText: (String) -> Unit = {}
 ) {
     val clipboardManager = LocalClipboardManager.current
     val recorderState by Recorder.recordState
     val readyToRecord = recorderState == Recorder.RecorderState.IDLE
     var isUserDialogVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-
-    }
     Surface(modifier = modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surfaceContainer) {
         Column {
             if (!readyToRecord) {
@@ -96,7 +93,8 @@ fun TranslateHomePage(
                                 onShowPageChange()
                             })
                 ) {
-                    TextField(value = "",
+                    TextField(
+                        value = "",
                         onValueChange = { },
                         enabled = false,
                         placeholder = {
@@ -123,7 +121,8 @@ fun TranslateHomePage(
                     Button(
                         onClick = {
                             clipboardManager.getText()?.let {
-                                pasteText(it.text)
+                                setSourceText(it.text)
+                                onShowPageChange()
                             }
                         },
                         enabled = readyToRecord,

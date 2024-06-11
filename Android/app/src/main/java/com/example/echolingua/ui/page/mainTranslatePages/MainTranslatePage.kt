@@ -51,14 +51,12 @@ fun MainTranslatePage(
     val targetLanguage = LanguageSelectStateHolder.getTargetLanguageDisplayName()
     when (showPage) {
         PageState.HOME_PAGE -> {
-            TranslateHomePage(
-                onShowPageChange = {
-                    showPage = PageState.INPUT_PAGE
-                },
+            TranslateHomePage(onShowPageChange = {
+                showPage = PageState.INPUT_PAGE
+            },
                 onNavigateToDataPage = onNavigateToDataPage,
-                pasteText = {
+                setSourceText = {
                     mainTranslatePageViewModel.setSourceText(it)
-                    showPage = PageState.INPUT_PAGE
                 },
                 sourceLanguage = sourceLanguage,
                 targetLanguage = targetLanguage,
@@ -100,7 +98,7 @@ fun MainTranslatePage(
                 onShowPageChange = {
                     showPage = it
                 },
-                pasteText = {
+                setSourceText = {
                     mainTranslatePageViewModel.setSourceText(it)
                 },
                 sourceLanguage = sourceLanguage,
@@ -185,12 +183,11 @@ fun MainTranslatePage(
         }
 
         PageState.AUDIO_PAGE -> {
-            TranslateAudioPage(
-                onBackClick = {
-                    mainTranslatePageViewModel.setSourceText("")
-                    mainTranslatePageViewModel.setTargetText("")
-                    showPage = PageState.HOME_PAGE
-                },
+            TranslateAudioPage(onBackClick = {
+                mainTranslatePageViewModel.setSourceText("")
+                mainTranslatePageViewModel.setTargetText("")
+                showPage = PageState.HOME_PAGE
+            },
                 sourceLanguage = sourceLanguage,
                 targetLanguage = targetLanguage,
                 onSwapLanguageClick = {
@@ -227,8 +224,7 @@ fun MainTranslatePage(
                 onDetailsClick = {
                     showPage = PageState.DISPLAY_PAGE
 
-                }
-            )
+                })
         }
     }
 }
