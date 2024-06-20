@@ -1,6 +1,8 @@
 package com.example.echolingua.ui.component
 
 import android.content.res.Configuration
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
@@ -31,6 +33,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.echolingua.ui.theme.CustomRippleTheme
@@ -46,7 +49,6 @@ import kotlin.math.sqrt
 
 private const val TAG = "MicButton"
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MicButton(
     modifier: Modifier = Modifier,
@@ -55,6 +57,7 @@ fun MicButton(
     onRecordEnd: () -> Unit = {},
     onUnavailableClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
     val isRecording = recordState == Recorder.RecorderState.RECORDING
     val animatedCornerSize by animateIntAsState(
         targetValue = if (isRecording) 10 else 50, label = ""
@@ -69,12 +72,6 @@ fun MicButton(
         targetValue = buttonAngle, label = "", animationSpec = tween(1000, easing = LinearEasing)
     )
     val coroutineScope = rememberCoroutineScope()
-    val recordPermissionState =
-        rememberPermissionState(permission = android.Manifest.permission.RECORD_AUDIO) {
-            if (it) {
-                onRecordStart()
-            }
-        }
     DisposableEffect(Unit) {
         coroutineScope.launch {
             withContext(Dispatchers.Main) {
@@ -107,7 +104,7 @@ fun MicButton(
             LargeFloatingActionButton(
                 onClick = {
                     when (recordState) {
-                        Recorder.RecorderState.IDLE -> recordPermissionState.launchPermissionRequest()
+                        Recorder.RecorderState.IDLE -> onRecordStart()
                         Recorder.RecorderState.RECORDING -> onRecordEnd()
                         Recorder.RecorderState.UNAVAILABLE -> onUnavailableClick()
                         else -> {}

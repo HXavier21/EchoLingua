@@ -46,7 +46,7 @@
 
 所有翻译结果均支持选中复制，输入框也支持粘贴。
 
-#### 存储功能
+#### 存储功能：用户可以随时查看翻译的历史记录
 
 用户进入历史记录界面可以看见所有翻译记录，文本、语音和图片翻译结果将有明显区分，用户甚至可以根据类型或内容进行历史记录检索，用户还可以查看、编辑和删除已存储的翻译结果。
 
@@ -119,6 +119,7 @@
 #### Translator
 
 ```kotlin
+// 翻译输入文本并在成功后执行回调
 fun translateWithAutoDetect(text: String, onSuccessCallback: (String) -> Unit = {})
 ```
 
@@ -127,6 +128,7 @@ fun translateWithAutoDetect(text: String, onSuccessCallback: (String) -> Unit = 
 #### Text Recognizer
 
 ```kotlin
+// 识别输入图片中指定语言的文本并在成功后执行回调
 fun processImage(imageFile: Uri, language: String, refreshRecognizedText: (Text) -> Unit = {})
 ```
 
@@ -135,19 +137,23 @@ fun processImage(imageFile: Uri, language: String, refreshRecognizedText: (Text)
 #### LibWhisper
 
 ```kotlin
+// 输入音频数据和目标语言以转录，并实时更新转录进度
 suspend fun transcribeData(
     data: FloatArray,
-    progressCallback: (Int) -> Unit = { }
+    progressCallback: (Int) -> Unit = { }，
+    language: String = "auto"
 ): String
+
+// 初始化模型
 external fun initContext(modelPath: String): Long
+
+// 释放模型占用空间
 external fun freeContext(contextPtr: Long)
-external fun fullTranscribe(
-	contextPtr: Long,
-	language: String,
-	progressCallback: ProgressCallback? = null,
-	audioData: FloatArray
-)
+
+// 获取音频中文本段个数
 external fun getTextSegmentCount(contextPtr: Long): Int
+
+// 获取音频中文本段
 external fun getTextSegment(contextPtr: Long, index: Int): String
 ```
 
@@ -156,8 +162,13 @@ external fun getTextSegment(contextPtr: Long, index: Int): String
 #### DataRepository
 
 ```kotlin
+// 插入翻译历史
 fun insert(translateHistoryItem: TranslateHistoryItem): Long = dao.insert(translateHistoryItem)
+
+// 获取所有翻译历史
 fun getAll(): List<TranslateHistoryItem> = dao.getAll()
+
+// 查询是否有相同的历史以合并
 fun checkIfTranslated(
     sourceLanguage: String,
     targetLanguage: String,
@@ -165,14 +176,57 @@ fun checkIfTranslated(
     targetText: String
 ): List<TranslateHistoryItem> =
     dao.checkIfTranslated(sourceLanguage, targetLanguage, sourceText, targetText)
+
+// 更新历史记录
 fun update(translateHistoryItem: TranslateHistoryItem) = dao.update(translateHistoryItem)
+
+// 删除历史记录
 fun delete(translateHistoryItem: TranslateHistoryItem) = dao.delete(translateHistoryItem)
 ```
 
-### 音频处理接口
+### 音频记录与处理处理接口
+
+#### Recorder
+
+```kotlin
+// 开始录音
+suspend fun startRecording()
+
+// 停止录音
+suspend fun stopRecording(
+    language: String = "auto", transcribeCallback: (String) -> Unit = {}
+)
+
+// 终止录音
+suspend fun cancelRecording()
+```
 
 #### FFmpegUtil
 
 ```kotlin
+// 将录音文件转换为可以转录的wav文件
 fun audioToWav(inputPath: String, outputPath: String)
+```
+
+### 网络请求接口
+
+#### OnlineServiceUtil
+
+```kotlin
+// 用户注册接口
+fun register(email: String, password: String)
+
+// 用户登陆接口
+fun login(email: String, password: String)
+
+// 在线翻译接口
+fun translate(
+    email: String,
+    sourceText: String,
+    sourceLanguage: String,
+    targetLanguage: String
+) 
+
+// 在线TTS服务接口
+fun getTTSService(model: String = "Asta", text: String, language: String) 
 ```

@@ -20,6 +20,8 @@ import com.example.echolingua.ui.page.stateHolders.WhisperModelStateHolder
 import com.example.echolingua.util.OnlineServiceUtil
 import com.example.echolingua.util.Recorder
 import com.example.echolingua.util.Translator
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -32,6 +34,7 @@ enum class PageState {
     HOME_PAGE, INPUT_PAGE, DISPLAY_PAGE, AUDIO_PAGE
 }
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainTranslatePage(
     modifier: Modifier = Modifier,
@@ -49,11 +52,22 @@ fun MainTranslatePage(
     val textStyle by mainTranslatePageViewModel.textStyleFlow.collectAsState()
     val sourceLanguage = LanguageSelectStateHolder.getSourceLanguageDisplayName()
     val targetLanguage = LanguageSelectStateHolder.getTargetLanguageDisplayName()
+    val recordPermissionState =
+        rememberPermissionState(permission = android.Manifest.permission.RECORD_AUDIO) {
+            if (it) {
+                if (WhisperModelStateHolder.canTranscribe.value) {
+                    coroutine.launch {
+                        Recorder.startRecording()
+                    }
+                }
+            }
+        }
     when (showPage) {
         PageState.HOME_PAGE -> {
-            TranslateHomePage(onShowPageChange = {
-                showPage = PageState.INPUT_PAGE
-            },
+            TranslateHomePage(
+                onShowPageChange = {
+                    showPage = PageState.INPUT_PAGE
+                },
                 onNavigateToDataPage = onNavigateToDataPage,
                 setSourceText = {
                     mainTranslatePageViewModel.setSourceText(it)
@@ -69,11 +83,7 @@ fun MainTranslatePage(
                 },
                 onNavigateToCameraPage = onNavigateToCameraPage,
                 onRecordStart = {
-                    if (WhisperModelStateHolder.canTranscribe.value) {
-                        coroutine.launch {
-                            Recorder.startRecording()
-                        }
-                    }
+                    recordPermissionState.launchPermissionRequest()
                 },
                 onRecordEnd = {
                     coroutine.launch {
@@ -197,11 +207,7 @@ fun MainTranslatePage(
                 onRecordStart = {
                     mainTranslatePageViewModel.setSourceText("")
                     mainTranslatePageViewModel.setTargetText("")
-                    if (WhisperModelStateHolder.canTranscribe.value) {
-                        coroutine.launch {
-                            Recorder.startRecording()
-                        }
-                    }
+                    recordPermissionState.launchPermissionRequest()
                 },
                 onRecordEnd = { language, callback ->
                     coroutine.launch {
